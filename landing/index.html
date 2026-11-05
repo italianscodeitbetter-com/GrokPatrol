@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GrokPatrol · Una telecamera vede. Il cane va a controllare.</title>
+<meta name="description" content="GrokPatrol è una ronda autonoma: Grok valuta quello che vede una telecamera, un cane robot raggiunge il punto e l'allarme arriva dopo la verifica.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbfbfa">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0e0e0e">
+<link rel="preload" href="assets/fonts/Geist-SemiBold.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="stylesheet" href="styles.css">
+<script>
+  (function (r) {
+    r.classList.add('js');
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) r.classList.add('motion');
+  })(document.documentElement);
+</script>
+<script src="app.js" defer></script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="grok-logo" viewBox="0 0 88 33"><path d="M76.4462 24.7077V8.41584H79.0216V19.1679L84.4685 12.9109H87.5908L82.6908 18.2731L87.6364 24.7077H84.5596L80.5539 19.1788L79.0216 19.1679V24.7077H76.4462Z" fill="currentColor"></path><path d="M68.6362 24.9815C64.8074 24.9815 62.7335 22.2662 62.7335 18.7979C62.7335 15.3068 64.8074 12.6143 68.6362 12.6143C72.4878 12.6143 74.5389 15.3068 74.5389 18.7979C74.5389 22.2662 72.4878 24.9815 68.6362 24.9815ZM65.4228 18.7979C65.4228 21.4904 66.8813 22.8366 68.6362 22.8366C70.4139 22.8366 71.8497 21.4904 71.8497 18.7979C71.8497 16.1054 70.4139 14.7363 68.6362 14.7363C66.8813 14.7363 65.4228 16.1054 65.4228 18.7979Z" fill="currentColor"></path><path d="M55.5659 24.7077V14.782L57.731 12.9109H62.3347V15.1014H58.1413V24.7077H55.5659Z" fill="currentColor"></path><path d="M45.7187 25.009C40.8101 25.009 37.8834 21.4448 37.8834 16.5846C37.8834 11.6788 40.9146 8.02795 45.8145 8.02795C49.6433 8.02795 52.4466 9.99027 53.1075 13.6411H50.1675C49.7345 11.5647 48.0024 10.401 45.8145 10.401C42.282 10.401 40.7322 13.4586 40.7322 16.5846C40.7322 19.7106 42.282 22.7454 45.8145 22.7454C49.1875 22.7454 50.6689 20.3039 50.7828 18.2731H45.7006V15.9105H53.381L53.3684 17.1457C53.3684 21.7359 51.4978 25.009 45.7187 25.009Z" fill="currentColor"></path><path d="M13.2371 21.0407L24.3186 12.8506C24.8619 12.4491 25.6384 12.6057 25.8973 13.2294C27.2597 16.5185 26.651 20.4712 23.9403 23.1851C21.2297 25.8989 17.4581 26.4941 14.0108 25.1386L10.2449 26.8843C15.6463 30.5806 22.2053 29.6665 26.304 25.5601C29.5551 22.3051 30.562 17.8683 29.6205 13.8673L29.629 13.8758C28.2637 7.99809 29.9647 5.64871 33.449 0.844576C33.5314 0.730667 33.6139 0.616757 33.6964 0.5L29.1113 5.09055V5.07631L13.2343 21.0436" fill="currentColor"></path><path d="M10.9503 23.0313C7.07343 19.3235 7.74185 13.5853 11.0498 10.2763C13.4959 7.82722 17.5036 6.82767 21.0021 8.2971L24.7595 6.55998C24.0826 6.07017 23.215 5.54334 22.2195 5.17313C17.7198 3.31926 12.3326 4.24192 8.67479 7.90126C5.15635 11.4239 4.0499 16.8403 5.94992 21.4622C7.36924 24.9165 5.04257 27.3598 2.69884 29.826C1.86829 30.7002 1.0349 31.5745 0.36364 32.5L10.9474 23.0341" fill="currentColor"></path></symbol>
+  <symbol id="grok-mark" viewBox="0 0 34 33"><path d="M13.2371 21.0407L24.3186 12.8506C24.8619 12.4491 25.6384 12.6057 25.8973 13.2294C27.2597 16.5185 26.651 20.4712 23.9403 23.1851C21.2297 25.8989 17.4581 26.4941 14.0108 25.1386L10.2449 26.8843C15.6463 30.5806 22.2053 29.6665 26.304 25.5601C29.5551 22.3051 30.562 17.8683 29.6205 13.8673L29.629 13.8758C28.2637 7.99809 29.9647 5.64871 33.449 0.844576C33.5314 0.730667 33.6139 0.616757 33.6964 0.5L29.1113 5.09055V5.07631L13.2343 21.0436" fill="currentColor"></path><path d="M10.9503 23.0313C7.07343 19.3235 7.74185 13.5853 11.0498 10.2763C13.4959 7.82722 17.5036 6.82767 21.0021 8.2971L24.7595 6.55998C24.0826 6.07017 23.215 5.54334 22.2195 5.17313C17.7198 3.31926 12.3326 4.24192 8.67479 7.90126C5.15635 11.4239 4.0499 16.8403 5.94992 21.4622C7.36924 24.9165 5.04257 27.3598 2.69884 29.826C1.86829 30.7002 1.0349 31.5745 0.36364 32.5L10.9474 23.0341" fill="currentColor"></path></symbol>
+</svg>
+<a class="skip" href="#contenuto">Vai al contenuto</a>
+
+<header class="top">
+  <div class="wrap top-row">
+    <a class="brand" href="#inizio">GrokPatrol</a>
+    <nav aria-label="Sezioni">
+      <a href="#evento">Come funziona</a>
+      <a href="#grok">Grok</a>
+      <a href="#app">App</a>
+      <a href="#allarmi">Allarmi</a>
+      <a href="#registro">Registro</a>
+    </nav>
+  </div>
+</header>
+
+<main id="contenuto">
+
+  <section class="hero" id="inizio">
+    <div class="wrap hero-text">
+      <p class="eyebrow lockup"><svg aria-hidden="true" focusable="false"><use href="#grok-mark"/></svg>Creato per il Grok Hackathon</p>
+      <h1>Una telecamera vede.<br>Il cane va a controllare.</h1>
+      <p class="lead">Grok valuta l'immagine, il cane raggiunge il punto e l'allarme ti arriva dopo la verifica sul posto. Niente conferma, niente allarme.</p>
+      <a class="btn" href="#evento">Guarda come funziona</a>
+    </div>
+    <figure class="wrap hero-shot">
+      <div class="stage">
+        <picture>
+          <source media="(max-width: 640px)" srcset="assets/console-map-phone.webp" width="1100" height="755">
+          <img src="assets/console-map.webp" width="2200" height="1656" fetchpriority="high"
+               alt="La console di GrokPatrol: mappa 3D del padiglione con il cane robot, le telecamere e i punti di ronda.">
+        </picture>
+        <svg class="route route-wide" viewBox="0 0 2200 1656" aria-hidden="true" focusable="false">
+          <path class="route-line" pathLength="1" d="M925 1173 C950 1110 1010 1085 1100 1082 S1240 1100 1284 1154 S1480 1178 1609 1184"/>
+          <circle class="dot-event" cx="1609" cy="1184" r="13"/>
+          <circle class="ping ping-a" cx="1609" cy="1184" r="62"/>
+          <circle class="ping ping-b" cx="1609" cy="1184" r="62"/>
+          <circle class="ring ring-start" cx="925" cy="1173" r="62"/>
+          <circle class="ring ring-end" cx="1609" cy="1184" r="62"/>
+        </svg>
+        <svg class="route route-phone" viewBox="0 0 1100 755" aria-hidden="true" focusable="false">
+          <path class="route-line" pathLength="1" d="M415 437 C435 386 484 365 558 363 S673 378 709 422 S870 442 976 447"/>
+          <circle class="dot-event" cx="976" cy="447" r="16"/>
+          <circle class="ping ping-a" cx="976" cy="447" r="70"/>
+          <circle class="ping ping-b" cx="976" cy="447" r="70"/>
+          <circle class="ring ring-start" cx="415" cy="437" r="70"/>
+          <circle class="ring ring-end" cx="976" cy="447" r="70"/>
+        </svg>
+        <button class="motion-toggle" type="button" aria-pressed="false" aria-label="Metti in pausa l'animazione" hidden>
+          <svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true"><rect x="4" y="3" width="3" height="10" rx="1"/><rect x="9" y="3" width="3" height="10" rx="1"/></svg>
+          <svg class="i-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.2v9.6c0 .5.5.8 1 .5l7.4-4.8c.4-.2.4-.8 0-1L6 2.7c-.5-.3-1 0-1 .5Z"/></svg>
+        </button>
+      </div>
+    </figure>
+  </section>
+
+  <section class="event" id="evento">
+    <div class="wrap">
+      <p class="eyebrow reveal">Un evento vero, dal registro</p>
+      <h2 class="reveal">41 secondi, dal movimento all'arrivo del cane.</h2>
+      <p class="lead reveal">Un telefono fa da telecamera all'ingresso est. Ecco cosa è successo, riga per riga.</p>
+
+      <div class="clock" aria-hidden="true">
+        <span class="clock-time" data-clock>+64 s</span>
+        <div class="scale">
+          <span class="scale-fill"></span>
+          <i data-t="0" style="--t:0"></i><i data-t="3.3" style="--t:3.3"></i><i data-t="22.2" style="--t:22.2"></i><i data-t="41" style="--t:41"></i><i data-t="60.1" style="--t:60.1"></i><i class="end" data-t="64" style="--t:64"></i>
+        </div>
+      </div>
+
+      <ol class="log">
+        <li data-t="0">
+          <time>+0 s</time>
+          <div><h3>La telecamera rileva</h3><p>Camera 1 segnala l'evento e invia l'immagine.</p></div>
+        </li>
+        <li data-t="0">
+          <time>+0 s</time>
+          <div><h3>Il cane parte</h3><p>Non aspetta la valutazione: guadagna tempo, e può sempre essere richiamato.</p></div>
+        </li>
+        <li data-t="3.3">
+          <time>+3 s</time>
+          <div><h3><svg class="gk" aria-hidden="true" focusable="false"><use href="#grok-mark"/></svg>Prima valutazione</h3><p>Il modello veloce di Grok propende per il falso allarme e chiede un secondo parere a quello più forte.</p></div>
+        </li>
+        <li data-t="22.2">
+          <time>+22 s</time>
+          <div><h3><svg class="gk" aria-hidden="true" focusable="false"><use href="#grok-mark"/></svg>Secondo parere</h3><p>Conferma il falso allarme. In simulazione il cane controlla comunque; sul campo verrebbe richiamato.</p></div>
+        </li>
+        <li data-t="41">
+          <time>+41 s</time>
+          <div><h3>Il cane arriva</h3><p>Si ferma a un metro dal punto, rivolto verso l'ingresso.</p></div>
+        </li>
+        <li data-t="60.1">
+          <time>+60 s</time>
+          <div><h3><svg class="gk" aria-hidden="true" focusable="false"><use href="#grok-mark"/></svg>Verifica</h3><p>Grok riguarda la scena e conferma la presenza di una persona.</p></div>
+        </li>
+        <li class="is-end" data-t="64">
+          <time>+64 s</time>
+          <div><h3><svg class="gk" aria-hidden="true" focusable="false"><use href="#grok-mark"/></svg>Allarme inviato</h3><p>Grok scrive il testo, il sistema lo manda sui canali attivi e tutto resta nel registro.</p></div>
+        </li>
+      </ol>
+
+      <p class="note reveal">Prova del 5 novembre 2026: telefono vero su Camera 1, cane simulato in MuJoCo, modalità che controlla sempre sul posto. I tempi cambiano con la distanza e con i modelli.</p>
+    </div>
+  </section>
+
+  <section class="looks" id="filtri">
+    <div class="wrap">
+      <h2 class="reveal">Due sguardi, prima di disturbarti.</h2>
+      <div class="two">
+        <article class="reveal">
+          <p class="time">circa 1–2 s</p>
+          <h3>Dalla telecamera</h3>
+          <p>Grok guarda l'immagine e un ingrandimento del punto. Luci, ombre, riflessi e il tuo stesso cane si fermano qui. Un «no» passa dal parere del modello più forte.</p>
+        </article>
+        <article class="reveal">
+          <p class="time">circa 3–8 s</p>
+          <h3>Dal cane</h3>
+          <p>All'arrivo si guarda sul posto. Se non c'è nulla non parte nessun allarme: la missione si chiude e resta nel registro.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="grok" id="grok">
+    <div class="wrap grok-grid">
+      <div>
+        <svg class="grok-logo reveal" role="img" aria-label="Grok" focusable="false"><use href="#grok-logo"/></svg>
+        <h2 class="reveal">Il giudizio è di Grok.</h2>
+        <p class="lead reveal">Tre modelli, ognuno con il suo compito. Se Grok non risponde, le regole prendono il suo posto e il sistema non si ferma.</p>
+      </div>
+      <dl class="models">
+        <div class="reveal"><dt>Valuta l'evento</dt><dd><span>grok-4.20</span><span>circa 1–2 s</span></dd></div>
+        <div class="reveal"><dt>Guarda all'arrivo</dt><dd><span>grok-4.3</span><span>circa 3–8 s</span></dd></div>
+        <div class="reveal"><dt>Console e report</dt><dd><span>grok-4.7</span><span>circa 3 s</span></dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="app" id="app">
+    <div class="wrap app-grid">
+      <div>
+        <h2 class="reveal">La ronda, in tasca.</h2>
+        <p class="lead reveal">La stessa console della scrivania, nell'app per iOS e Android.</p>
+        <ul class="plain reveal">
+          <li>Segui il cane sulla mappa 3D e guarda quello che vede.</li>
+          <li>Arma l'allarme con un tocco.</li>
+          <li>Prendi il controllo quando serve.</li>
+          <li>Apri una telecamera a tutto schermo.</li>
+        </ul>
+      </div>
+      <figure class="phone reveal">
+        <img src="assets/app-dashboard.webp" width="820" height="1468" loading="lazy" decoding="async"
+             alt="L'app di GrokPatrol: mappa 3D del padiglione, stato del cane e pulsanti per seguirlo o aprire il video.">
+      </figure>
+    </div>
+    <figure class="wrap wide reveal">
+      <img src="assets/camera-full.webp" width="1700" height="746" loading="lazy" decoding="async"
+           alt="Una telecamera a tutto schermo nell'app: il padiglione ripreso dall'alto, con l'etichetta Live.">
+      <figcaption>Telecamera a tutto schermo: immagine intera, senza tagli.</figcaption>
+    </figure>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <div class="finder reveal" aria-hidden="true"><i></i><i></i><i></i><i></i><span class="rec"></span></div>
+      <h2 class="reveal">Qualsiasi telefono diventa una telecamera.</h2>
+      <p class="lead reveal">Apri una pagina nel browser e tocca Start camera. Il rilevatore gira sul telefono, senza installare nulla.</p>
+    </div>
+  </section>
+
+  <section class="alerts" id="allarmi">
+    <div class="wrap alerts-grid">
+      <div>
+        <h2 class="reveal">Quando arriva, puoi già decidere.</h2>
+        <p class="lead reveal">Foto, testo chiaro e pulsanti per agire dal telefono. Arriva su Telegram, e puoi aggiungere SMS e chiamata vocale.</p>
+      </div>
+      <figure class="alert reveal">
+        <img src="assets/camera-scene.webp" width="900" height="509" loading="lazy" decoding="async" alt="La foto della scena allegata all'allarme.">
+        <div class="alert-body">
+          <p class="alert-title">Allarme Presenza Non Autorizzata</p>
+          <p>Padiglione 3, Ingresso est, ore 13:35. Rilevata persona fuori zona rossa confermata. Rischio alto. Verificare subito presenza non autorizzata.</p>
+        </div>
+        <ul class="alert-actions" aria-label="Azioni dell'allarme">
+          <li>Preso in carico</li><li>Ricontrolla</li><li>Ferma il cane</li><li>Cane alla base</li>
+        </ul>
+        <figcaption>Testo dal registro della prova, foto dalla simulazione.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="ledger" id="registro">
+    <div class="wrap">
+      <h2 class="reveal">Ogni passo resta scritto.</h2>
+      <p class="lead reveal">Rilevamento, valutazione, partenza, arrivo, verifica, allarme: ogni riga ha i suoi identificativi. A fine turno hai il report e il CSV.</p>
+      <figure class="shot reveal">
+        <picture>
+          <source media="(max-width: 640px)" srcset="assets/console-reports-phone.webp" width="1000" height="924">
+          <img src="assets/console-reports.webp" width="1800" height="1139" loading="lazy" decoding="async"
+               alt="La pagina Reports della console: eventi, anomalie confermate, falsi allarmi bloccati, tempo medio di arrivo e registro delle attività.">
+        </picture>
+      </figure>
+    </div>
+  </section>
+
+  <section class="same">
+    <div class="wrap">
+      <h2 class="reveal">Simulato o reale, il flusso è lo stesso.</h2>
+      <p class="lead reveal">Prova tutto in un museo fisico in MuJoCo, poi porta lo stesso sistema sul vero Unitree Go1.</p>
+      <!-- Destinazione provvisoria: sostituire con il link o il contatto definitivo della demo. -->
+      <a class="btn reveal" href="mailto:?subject=Demo%20GrokPatrol">Richiedi una demo</a>
+    </div>
+  </section>
+
+</main>
+
+<section class="credits" aria-labelledby="crediti">
+  <div class="wrap">
+    <h2 id="crediti" class="reveal">Un progetto di</h2>
+    <ul class="reveal">
+      <li>
+        <a href="https://icib.dev/" target="_blank" rel="noopener" aria-label="Italians Code It Better, si apre in una nuova scheda">
+          <picture>
+            <source media="(prefers-color-scheme: dark)" srcset="assets/logos/icib-white.png">
+            <img class="logo-icib" src="assets/logos/icib.png" width="720" height="383" alt="" loading="lazy">
+          </picture>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.vivido.world/" target="_blank" rel="noopener" aria-label="Vivido, si apre in una nuova scheda">
+          <svg class="logo-vivido" aria-hidden="true" focusable="false" width="125" height="32" viewBox="0 0 125 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M20.8936 0.173828C21.0666 -0.0324138 21.3748 -0.0588027 21.5811 0.114258L25.3096 3.24316C25.5158 3.41617 25.543 3.72344 25.3701 3.92969L18.7119 11.8643C18.6612 11.9247 18.599 11.9695 18.5311 11.9982C18.3492 12.0753 18.1331 12.122 17.9355 12.1221H14.0615C13.8627 12.1221 13.6447 12.0755 13.4618 11.9976C13.3945 11.9689 13.3327 11.9244 13.2822 11.8643L6.62402 3.92969C6.451 3.72349 6.47749 3.41625 6.68359 3.24316L10.4131 0.114258C10.6193 -0.058736 10.9265 -0.0322077 11.0996 0.173828L15.2492 5.11961C15.6389 5.58401 16.3534 5.58405 16.743 5.11969L20.8936 0.173828Z" fill="#EC612A"/>
+<path d="M20.8955 31.8262C21.0686 32.0321 21.3759 32.0586 21.582 31.8857L25.3115 28.7568C25.5177 28.5838 25.5441 28.2765 25.3711 28.0703L18.7129 20.1348C18.6608 20.0729 18.5967 20.0276 18.5269 19.9991C18.3456 19.9252 18.1314 19.881 17.9355 19.8809H14.0615C13.8652 19.8809 13.65 19.9248 13.4682 19.999C13.3984 20.0275 13.3343 20.0728 13.2822 20.1348L6.62402 28.0703C6.45098 28.2765 6.47738 28.5838 6.68359 28.7568L10.4131 31.8857C10.6192 32.0586 10.9265 32.0321 11.0996 31.8262L15.2502 26.8794C15.6399 26.415 16.3543 26.415 16.744 26.8793L20.8955 31.8262Z" fill="#74DB8B"/>
+<path d="M31.8818 10.4163C32.0549 10.6225 32.0285 10.9297 31.8223 11.1028L26.8755 15.2533C26.4111 15.643 26.4111 16.3575 26.8756 16.7472L31.8223 20.8977C32.0285 21.0708 32.0549 21.378 31.8818 21.5842L28.7529 25.3137C28.5798 25.5198 28.2726 25.5463 28.0664 25.3733L20.1309 18.7161C20.0683 18.6635 20.0227 18.5987 19.9943 18.528C19.9216 18.347 19.878 18.1338 19.8779 17.9387L19.8779 14.0647C19.8779 13.8691 19.921 13.655 19.9942 13.4736C20.0226 13.4029 20.0683 13.338 20.1309 13.2854L28.0664 6.6272C28.2726 6.45421 28.5798 6.48076 28.7529 6.68677L31.8818 10.4163Z" fill="#644BF6"/>
+<path d="M0.173827 20.8962C-0.0324266 21.0693 -0.0588114 21.3775 0.114257 21.5837L3.24316 25.3123C3.41618 25.5184 3.72343 25.5457 3.92969 25.3728L11.8652 18.7146C11.9263 18.6633 11.9712 18.6003 11.9998 18.5317C12.0754 18.3501 12.1211 18.135 12.1211 17.9382L12.1211 14.0642C12.121 13.8662 12.0755 13.6493 11.9995 13.4665C11.971 13.398 11.9262 13.3351 11.8652 13.2839L3.92969 6.62671C3.72348 6.45368 3.41625 6.48015 3.24316 6.68628L0.114258 10.4158C-0.0587302 10.622 -0.0323427 10.9292 0.173828 11.1023L5.11961 15.2519C5.58401 15.6416 5.58405 16.356 5.11969 16.7457L0.173827 20.8962Z" fill="#EF87E7"/>
+<path d="M52.3913 5.77984H56.2608L49.1328 26H44.5942L37.4662 5.77984H41.3357L46.8635 21.665L52.3913 5.77984ZM59.9366 8.22371C58.511 8.22371 57.4054 7.20543 57.4054 5.77984C57.4054 4.35424 58.511 3.27777 59.9366 3.27777C61.3622 3.27777 62.4677 4.35424 62.4677 5.77984C62.4677 7.20543 61.3622 8.22371 59.9366 8.22371ZM58.0746 26V10.6676H61.7695V26H58.0746ZM75.7088 10.6676H79.5492L73.7013 26H69.4536L63.6058 10.6676H67.4462L71.5775 22.4506L75.7088 10.6676ZM83.2343 8.22371C81.8087 8.22371 80.7031 7.20543 80.7031 5.77984C80.7031 4.35424 81.8087 3.27777 83.2343 3.27777C84.6599 3.27777 85.7655 4.35424 85.7655 5.77984C85.7655 7.20543 84.6599 8.22371 83.2343 8.22371ZM81.3723 26V10.6676H85.0672V26H81.3723ZM100.112 4.73246H103.807V26H100.374V24.0507C99.1811 25.5054 97.4646 26.3491 95.3116 26.3491C90.9185 26.3491 87.7182 22.9161 87.7182 18.3483C87.7182 13.7515 90.8312 10.3185 95.2243 10.3185C97.2609 10.3185 98.9193 11.0749 100.112 12.355V4.73246ZM95.8062 23.0906C98.4538 23.0906 100.258 21.1413 100.258 18.3483C100.258 15.5262 98.4538 13.6061 95.8062 13.6061C93.2751 13.6061 91.4131 15.6135 91.4131 18.3483C91.4131 21.0832 93.2751 23.0906 95.8062 23.0906ZM114.617 26.3491C109.816 26.3491 106.442 22.9161 106.442 18.3483C106.442 13.7515 109.816 10.3185 114.617 10.3185C119.388 10.3185 122.792 13.7515 122.792 18.3483C122.792 22.9161 119.388 26.3491 114.617 26.3491ZM114.646 23.0615C117.264 23.0615 119.068 21.0832 119.068 18.3192C119.068 15.5844 117.294 13.6352 114.646 13.6352C111.969 13.6352 110.136 15.5844 110.136 18.3483C110.136 21.0832 111.969 23.0615 114.646 23.0615Z" fill="currentColor"/>
+</svg>
+        </a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <p>GrokPatrol · Grok Hackathon, Track D (Riello)</p>
+    <p>Grok è un marchio di SpaceXSI. Unitree e Go1 sono marchi di Unitree Robotics.</p>
+  </div>
+</footer>
+
+</body>
+</html>
