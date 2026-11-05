@@ -17,12 +17,15 @@ Same flow on a 3D physical museum (MuJoCo, the real Go1 model) and on the real *
 
 *Grok Hackathon · Track D (Riello)*
 
+<img src="docs/screenshots/admin-dashboard.png" alt="GrokPatrol console: the live 3D map of the room with the Go1, patrol points and cameras" width="100%">
+
 </div>
 
 ---
 
 ## Contents
 
+- [Screenshots](#-screenshots)
 - [How it works](#-how-it-works)
 - [What's in the box](#-whats-in-the-box)
 - [Quick start](#-quick-start)
@@ -37,6 +40,29 @@ Same flow on a 3D physical museum (MuJoCo, the real Go1 model) and on the real *
 - [On site with the real Go1](#-on-site-with-the-real-go1)
 - [Phones from any network](#-phones-from-any-network-public-tunnel)
 - [Repository map](#-repository-map)
+
+---
+
+## 📸 Screenshots
+
+### 🖥️ GrokPatrol console (`admin/web`)
+
+| Dashboard: the live 3D map | Missions |
+|---|---|
+| <img src="docs/screenshots/admin-dashboard.png" alt="Dashboard with the 3D map, the Go1, patrol points and cameras"> | <img src="docs/screenshots/admin-missions.png" alt="Missions in progress and completed, with trigger and response time"> |
+| **Reports**: events, confirmed anomalies, blocked false alarms, time to arrival and the full log | **Automation**: the alarm and the patrol routes |
+| <img src="docs/screenshots/admin-reports.png" alt="Reports with KPIs and the activity log"> | <img src="docs/screenshots/admin-automation.png" alt="Automations: alarm and patrol routes"> |
+
+### 📱 Mobile app (`grokdog_mobile`)
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/mobile-dashboard.jpg" width="200" alt="Mobile dashboard: live 3D map"><br><sub><b>Live 3D map</b></sub></td>
+    <td align="center"><img src="docs/screenshots/mobile-dog.jpg" width="200" alt="Mobile dashboard: the dog card with Follow and Live view"><br><sub><b>The dog: follow · live view</b></sub></td>
+    <td align="center"><img src="docs/screenshots/mobile-automation.jpg" width="200" alt="Mobile automations: alarm and patrols"><br><sub><b>Automation</b></sub></td>
+    <td align="center"><img src="docs/screenshots/mobile-missions.jpg" width="200" alt="Mobile missions with real anomalies"><br><sub><b>Missions</b></sub></td>
+  </tr>
+</table>
 
 ---
 
