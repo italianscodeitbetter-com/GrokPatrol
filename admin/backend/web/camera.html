@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>Ronda · Camera</title>
+<style>
+  :root { --bg: #000; --text: #f2f3f5; --muted: #9aa0a8; --ok: #3ccf8e; --bad: #ff3b30; --warn: #f2b33d; --accent: #4f8cff;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); overflow: hidden; }
+  button, select { font: inherit; color: inherit; }
+  .wrap { position: fixed; inset: 0; display: grid; place-items: center; }
+  video, canvas.ov { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+  canvas.ov { touch-action: none; }
+  .bar { position: fixed; left: 0; right: 0; display: flex; gap: 8px; align-items: center; padding: 10px 12px;
+    background: linear-gradient(rgba(0,0,0,.75), rgba(0,0,0,0)); z-index: 3; flex-wrap: wrap; }
+  .bar.top { top: 0; padding-top: max(10px, env(safe-area-inset-top)); }
+  .bar.bottom { bottom: 0; background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,.8)); padding-bottom: max(12px, env(safe-area-inset-bottom)); justify-content: center; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; background: rgba(20,21,24,.8); font-size: 13px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+  .dot.ok { background: var(--ok); } .dot.bad { background: var(--bad); } .dot.warn { background: var(--warn); }
+  .btn { padding: 10px 14px; border-radius: 10px; background: rgba(28,30,35,.9); border: 1px solid #343840; min-height: 44px; }
+  .btn.on { background: var(--bad); border-color: var(--bad); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); }
+  select { background: rgba(28,30,35,.9); border: 1px solid #343840; border-radius: 10px; padding: 8px 10px; }
+  .start { position: fixed; inset: 0; z-index: 5; display: grid; place-items: center; background: #0b0c0e; padding: 24px; }
+  .start .card { max-width: 420px; width: 100%; display: grid; gap: 14px; }
+  .start h1 { margin: 0; font-size: 22px; }
+  .start p { margin: 0; color: var(--muted); line-height: 1.45; }
+  .flash { position: fixed; inset: 0; border: 6px solid var(--bad); z-index: 4; pointer-events: none; opacity: 0; transition: opacity .2s; }
+  .flash.on { opacity: 1; }
+  .hint { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 4; background: rgba(0,0,0,.7); padding: 10px 14px; border-radius: 10px; font-size: 14px; display: none; }
+</style>
+</head>
+<body>
+<div class="start" id="start">
+  <div class="card">
+    <h1>Ronda camera</h1>
+    <p>This phone becomes a surveillance camera. It spots people and bags on the device and sends only events and small previews to the console.</p>
+    <select id="camSel" aria-label="Camera"></select>
+    <select id="modelSel" aria-label="Detector">
+      <option value="lite">Fast detector (phones)</option>
+      <option value="v2">Accurate detector (laptops)</option>
+    </select>
+    <button class="btn primary" id="go">Start camera</button>
+    <p id="startMsg"></p>
+  </div>
+</div>
+
+<div class="wrap">
+  <video id="v" playsinline muted autoplay></video>
+  <canvas class="ov" id="ov"></canvas>
+</div>
+<div class="flash" id="flash"></div>
+
+<div class="bar top">
+  <span class="pill"><span class="dot" id="netDot"></span><span id="name">Camera</span></span>
+  <span class="pill" id="det">loading detector</span>
+  <span class="pill" id="fps">0 fps</span>
+  <span class="pill" id="mot">motion 0%</span>
+  <span class="pill" id="alarmPill"><span class="dot" id="alarmDot"></span><span id="alarmTxt">alarm off</span></span>
+</div>
+<div class="bar bottom">
+  <button class="btn" id="arm">Camera on</button>
+  <button class="btn" id="flip">Flip</button>
+  <button class="btn" id="test">Test event</button>
+</div>
+
+<script src="/static/vendor/tf.min.js"></script>
+<script src="/static/vendor/coco-ssd.min.js"></script>
+<script>
+const $ = (s) => document.querySelector(s);
+const params = new URLSearchParams(location.search);
+const BAGS = new Set(["backpack", "handbag", "suitcase"]);
+const INTRUSION_S = 1.0, ABANDON_S = 8, ALONE_S = 4, COOLDOWN_S = 20;
+// a phone gets its own camera id: site cameras may already be taken by the simulator or by another phone
+const phoneId = () => { let id = localStorage.getItem("ronda.phone");
+  if (!id) { id = "phone-" + Math.random().toString(16).slice(2, 6); localStorage.setItem("ronda.phone", id); } return id; };
+const st = { cam: params.get("cam") || localStorage.getItem("ronda.cam") || phoneId(), live: false, ws: null, model: null, stream: null,
+  facing: "environment", armed: true, zone: null, drawing: false, dets: [], fps: 0, intrStart: 0, intrLast: 0, intrFired: false,
+  tracks: [], lastPerson: 0, lastEvent: {}, isDog: false,
+  alarm: { armed: false, active_at: null }, bg: null, motionFrames: 0, personStart: 0, personLast: 0 };
+const alarmActive = () => st.alarm.armed && Date.now() / 1000 >= (st.alarm.active_at || 0);
+
+// --- camera list from the server
+(async () => {
+  try {
+    const s = await (await fetch("/api/state")).json();
+    const taken = (id) => s.cameras.some((c) => c.id === id && c.online);
+    const named = (id, n) => (taken(id) ? `${n} (in use)` : n);
+    const opts = [[phoneId(), "This phone, as a new camera"], ...s.site.cameras.map((c) => [c.id, named(c.id, c.name)]),
+      ["dog", named("dog", "Camera on the dog")]];
+    $("#camSel").innerHTML = opts.map(([id, n]) => `<option value="${id}" ${id === st.cam ? "selected" : ""}>${n}</option>`).join("");
+  } catch (e) { $("#startMsg").textContent = "Server not reachable: " + e; }
+  if (params.get("model") === "v2") $("#modelSel").value = "v2";
+})();
+
+$("#go").onclick = async () => {
+  st.cam = $("#camSel").value; localStorage.setItem("ronda.cam", st.cam);
+  st.isDog = st.cam === "dog"; st.armed = true;
+  try { await startVideo(); } catch (e) { $("#startMsg").textContent = "Camera blocked: " + e.message + ". Open this page over https and allow the camera."; return; }
+  $("#start").style.display = "none";
+  connect(); keepAwake(); motionLoop(); loadModel($("#modelSel").value); renderArm();
+};
+
+async function startVideo() {
+  if (st.stream) st.stream.getTracks().forEach((t) => t.stop());
+  st.stream = await navigator.mediaDevices.getUserMedia({ audio: false,
+    video: { facingMode: st.facing, width: { ideal: 1280 }, height: { ideal: 720 } } });
+  $("#v").srcObject = st.stream; await $("#v").play();
+}
+$("#flip").onclick = async () => { st.facing = st.facing === "environment" ? "user" : "environment"; await startVideo(); };
+
+async function keepAwake() { try { await navigator.wakeLock?.request("screen"); } catch {} document.addEventListener("visibilitychange", () => document.visibilityState === "visible" && navigator.wakeLock?.request("screen").catch(() => {})); }
+
+// --- websocket to the server
+function connect() {
+  let ws;
+  try { ws = new WebSocket((location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws/camera/" + encodeURIComponent(st.cam)); }
+  catch { startHttp(); return; }
+  st.ws = ws;
+  const failTimer = setTimeout(() => { if (ws.readyState !== 1) { try { ws.close(); } catch {} startHttp(); } }, 4000);
+  ws.onopen = () => { clearTimeout(failTimer); st.http = false; $("#netDot").className = "dot ok"; };
+  ws.onclose = (e) => {
+    clearTimeout(failTimer);
+    if (st.http) return;
+    $("#netDot").className = "dot bad";
+    // 4409: another device took this camera. Reconnecting would throw it out, and the picture would swap forever
+    if (e.code === 4409) { $("#name").textContent = "In use by another device"; return; }
+    setTimeout(connect, 1500);
+  };
+  ws.onmessage = (e) => onServer(JSON.parse(e.data));
+}
+function onServer(m) {
+  if (m.type === "config") { $("#name").textContent = m.name; st.zone = null; }
+  else if (m.type === "live") st.live = !!m.on;
+  else if (m.type === "capture") send({ type: "frame", req: m.req, jpeg: grab(960, !st.isDog, false) });
+  else if (m.type === "alarm") { st.alarm = { armed: !!m.armed, active_at: m.active_at }; st.bg = null; st.motionFrames = 0; renderAlarm(); }
+}
+// no websocket (iPhone Safari often refuses it with a self-signed certificate): plain requests every half second
+async function post(m) {
+  try {
+    const r = await fetch("/api/cam/" + encodeURIComponent(st.cam), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(m || {}) });
+    const j = await r.json(); $("#netDot").className = "dot warn";
+    (j.inbox || []).forEach(onServer);
+  } catch { $("#netDot").className = "dot bad"; }
+}
+function startHttp() {
+  if (st.http) return;
+  st.http = true; st.ws = null;
+  const tick = async () => { if (st.http) { await post(null); setTimeout(tick, 500); } };
+  tick();
+}
+function send(m) {
+  if (st.ws?.readyState === 1) st.ws.send(JSON.stringify(m));
+  else if (st.http) return post(m);
+}
+
+// --- frames
+const work = document.createElement("canvas");
+function grab(maxW, withZone, withBoxes, quality = 0.8) {
+  const v = $("#v"); if (!v.videoWidth) return null;
+  const k = Math.min(1, maxW / v.videoWidth); const W = Math.round(v.videoWidth * k), H = Math.round(v.videoHeight * k);
+  work.width = W; work.height = H; const c = work.getContext("2d");
+  c.drawImage(v, 0, 0, W, H);
+  if (withZone && st.zone) { const [x, y, w, h] = st.zone; c.strokeStyle = "#ff2a1f"; c.lineWidth = Math.max(3, W / 200); c.strokeRect(x * W, y * H, w * W, h * H); }
+  if (withBoxes) for (const d of st.dets) { const [x, y, w, h] = d.nbox; c.strokeStyle = "#ffd600"; c.lineWidth = Math.max(2, W / 260); c.strokeRect(x * W, y * H, w * W, h * H);
+    c.fillStyle = "#ffd600"; c.font = `${Math.max(12, W / 50)}px sans-serif`; c.fillText(`${d.class} ${(d.score * 100) | 0}%`, x * W + 4, y * H + Math.max(14, W / 45)); }
+  return work.toDataURL("image/jpeg", quality).split(",")[1];
+}
+// a small frame every second; while someone watches this camera, larger frames as fast as the network takes them
+let lastPreview = 0, sending = false;
+async function previews() {
+  const every = !st.live ? 1000 : st.http ? 200 : 100;
+  const now = performance.now();
+  const clear = st.ws ? st.ws.bufferedAmount < 1e6 : true;
+  if ((st.ws?.readyState === 1 || st.http) && !sending && clear && now - lastPreview >= every) {
+    lastPreview = now; sending = true;
+    try { await send({ type: "preview", jpeg: st.live ? grab(960, !st.isDog, true, 0.6) : grab(320, !st.isDog, true) }); }
+    finally { sending = false; }
+  }
+  setTimeout(previews, 30);
+}
+previews();
+setInterval(() => send({ type: "status", fps: st.fps, armed: st.armed, model: st.model ? $("#modelSel").value : null, motion: Math.round((st.motionPct || 0) * 100),
+  people: st.dets.filter((d) => d.class === "person").length, objects: st.dets.filter((d) => BAGS.has(d.class)).length, detector: "coco-ssd" }), 2000);
+
+// --- detector
+async function loadModel(which) {
+  // the person detector is optional: it only helps to locate people. Motion works without it.
+  const base = which === "v2" ? "mobilenet_v2" : "lite_mobilenet_v2";
+  const dir = which === "v2" ? "ssd_mobilenet_v2" : "ssdlite_mobilenet_v2";
+  $("#det").textContent = "detector loading";
+  try {
+    try { await tf.setBackend("webgl"); await tf.ready(); } catch { await tf.setBackend("cpu"); await tf.ready(); }
+    st.model = await cocoSsd.load({ base, modelUrl: `/static/vendor/models/${dir}/model.json` });
+    $("#det").textContent = "detector on (" + tf.getBackend() + ")";
+    detectLoop();
+  } catch (e) {
+    $("#det").textContent = "no person detector: motion only";
+    send({ type: "log", message: "person detector failed: " + (e && e.message) });
+  }
+}
+// person detector, when available
+async function detectLoop() {
+  const v = $("#v");
+  if (v.videoWidth && st.model) {
+    try {
+      const raw = await st.model.detect(v, 20, 0.45);
+      const W = v.videoWidth, H = v.videoHeight;
+      st.dets = raw.filter((d) => d.class === "person" || BAGS.has(d.class))
+        .map((d) => ({ ...d, nbox: [d.bbox[0] / W, d.bbox[1] / H, d.bbox[2] / W, d.bbox[3] / H] }));
+    } catch { st.dets = []; }
+  }
+  setTimeout(detectLoop, 250);
+}
+// motion, always on: this is what raises the events
+let frames = 0, t0 = performance.now();
+function motionLoop() {
+  const v = $("#v");
+  if (v.videoWidth) {
+    armedRules(); draw();
+    frames++; const now = performance.now();
+    if (now - t0 > 1000) { st.fps = Math.round((frames * 1000) / (now - t0)); frames = 0; t0 = now; $("#fps").textContent = st.fps + " fps"; }
+  }
+  setTimeout(motionLoop, 150);
+}
+
+// --- motion: compare each small grey frame with a slowly updated background
+const mc = document.createElement("canvas"); mc.width = 96; mc.height = 72;
+const mctx = mc.getContext("2d", { willReadFrequently: true });
+function motion() {
+  const v = $("#v"); if (!v.videoWidth) return null;
+  mctx.drawImage(v, 0, 0, mc.width, mc.height);
+  const px = mctx.getImageData(0, 0, mc.width, mc.height).data;
+  const n = mc.width * mc.height, g = new Float32Array(n);
+  for (let i = 0; i < n; i++) g[i] = 0.3 * px[4 * i] + 0.59 * px[4 * i + 1] + 0.11 * px[4 * i + 2];
+  if (!st.bg) { st.bg = g; return null; }
+  let changed = 0, x0 = mc.width, y0 = mc.height, x1 = -1, y1 = -1;
+  for (let i = 0; i < n; i++) {
+    if (Math.abs(g[i] - st.bg[i]) > 28) {
+      changed++; const x = i % mc.width, y = (i / mc.width) | 0;
+      if (x < x0) x0 = x; if (y < y0) y0 = y; if (x > x1) x1 = x; if (y > y1) y1 = y;
+    }
+    st.bg[i] = st.bg[i] * 0.96 + g[i] * 0.04;
+  }
+  const frac = changed / n;
+  st.motionPct = frac;
+  return frac > 0.012 ? { frac, box: [x0 / mc.width, y0 / mc.height, (x1 - x0 + 1) / mc.width, (y1 - y0 + 1) / mc.height] } : null;
+}
+function armedRules() {
+  if (st.isDog || !st.armed) { st.motionFrames = 0; return; }
+  if (!alarmActive()) { motion(); $("#mot").textContent = `motion ${Math.round((st.motionPct || 0) * 100)}% · alarm off`; st.motionFrames = 0; return; }
+  const mv = motion();
+  $("#mot").textContent = `motion ${Math.round((st.motionPct || 0) * 100)}%` + (mv ? " · moving" : "");
+  st.motionFrames = mv ? st.motionFrames + 1 : 0;
+  if (st.motionFrames >= 3) { fire("motion", [{ score: Math.min(0.99, 0.5 + mv.frac * 5) }], mv.box); st.motionFrames = 0; }
+}
+function renderAlarm() {
+  const on = alarmActive(), arming = st.alarm.armed && !on;
+  $("#alarmDot").className = "dot " + (on ? "bad" : arming ? "warn" : "");
+  $("#alarmTxt").textContent = on ? "ALARM ARMED" : arming ? "arming" : "alarm off";
+}
+setInterval(renderAlarm, 1000);
+
+// --- rules: intrusion and abandoned object
+const inZone = (x, y) => { const z = st.zone; return z && x >= z[0] && x <= z[0] + z[2] && y >= z[1] && y <= z[1] + z[3]; };
+const iou = (a, b) => { const x1 = Math.max(a[0], b[0]), y1 = Math.max(a[1], b[1]), x2 = Math.min(a[0] + a[2], b[0] + b[2]), y2 = Math.min(a[1] + a[3], b[1] + b[3]);
+  const i = Math.max(0, x2 - x1) * Math.max(0, y2 - y1); return i / (a[2] * a[3] + b[2] * b[3] - i || 1); };
+const near = (p, b) => { const g = [p[0] - p[2] * 0.4, p[1], p[2] * 1.8, p[3] * 1.1]; return iou(g, b) > 0 || (b[0] < g[0] + g[2] && b[0] + b[2] > g[0] && b[1] < g[1] + g[3] && b[1] + b[3] > g[1]); };
+function rules() {
+  if (!st.armed || st.isDog || !st.zone) return;
+  const now = performance.now() / 1000;
+  const people = st.dets.filter((d) => d.class === "person");
+  const intruders = people.filter((d) => inZone(d.nbox[0] + d.nbox[2] / 2, d.nbox[1] + d.nbox[3]));
+  if (intruders.length) { st.intrStart = st.intrStart || now; st.intrLast = now; }
+  else if (now - st.intrLast > 0.6) { st.intrStart = 0; if (now - st.intrLast > 5) st.intrFired = false; }
+  if (st.intrStart && now - st.intrStart >= INTRUSION_S && !st.intrFired) { st.intrFired = true; fire("intrusion", intruders); }
+  // bags: track by overlap, alert when one stays still with nobody next to it
+  const bags = st.dets.filter((d) => BAGS.has(d.class) && inZone(d.nbox[0] + d.nbox[2] / 2, d.nbox[1] + d.nbox[3] * 0.8));
+  for (const b of bags) {
+    let t = st.tracks.find((t) => iou(t.box, b.nbox) > 0.3);
+    if (!t) { t = { box: b.nbox, first: now, alone: now, fired: false, d: b }; st.tracks.push(t); }
+    t.last = now; t.d = b; if (iou(t.box, b.nbox) < 0.5) { t.box = b.nbox; t.first = now; }
+    if (people.some((p) => near(p.nbox, b.nbox))) t.alone = now;
+    if (!t.fired && now - t.first >= ABANDON_S && now - t.alone >= ALONE_S) { t.fired = true; fire("abandoned_object", [b]); }
+  }
+  st.tracks = st.tracks.filter((t) => now - t.last < 5);
+}
+function fire(kind, hits, motionBox) {
+  const now = Date.now() / 1000;
+  if (now - (st.lastEvent[kind] || 0) < (kind === "motion" ? 15 : COOLDOWN_S)) return;
+  st.lastEvent[kind] = now;
+  send({ type: "event", kind, score: Math.max(...hits.map((h) => h.score)),
+    detections: st.dets.map((d) => ({ label: d.class, score: +d.score.toFixed(2), box: d.nbox.map((v) => +v.toFixed(3)) })),
+    motion_box: motionBox || null,
+    jpeg: grab(960, true, false), jpeg_annotated: grab(960, true, true), note: "phone camera, on-device detector: " + (kind === "motion" ? `part of the image changed${st.dets.length ? " (" + [...new Set(st.dets.map((d) => d.class))].join(", ") + " detected)" : ""}, alarm armed` : kind === "intrusion" ? `person's feet inside the red zone for ${(performance.now() / 1000 - st.intrStart).toFixed(1)} s` : kind === "abandoned_object" ? "bag inside the red zone with nobody next to it for 4 s" : "manual test") });
+  $("#flash").classList.add("on"); setTimeout(() => $("#flash").classList.remove("on"), 600);
+  navigator.vibrate?.(200);
+}
+$("#test").onclick = () => { st.lastEvent.manual = 0; fire("manual", st.dets.length ? st.dets : [{ score: 0.99 }]); };
+
+// --- overlay and zone drawing
+const ov = $("#ov");
+function viewRect() { const v = $("#v"); const r = ov.getBoundingClientRect(); const ar = (v.videoWidth || 16) / (v.videoHeight || 9);
+  let w = r.width, h = r.width / ar; if (h > r.height) { h = r.height; w = h * ar; } return { x: (r.width - w) / 2, y: (r.height - h) / 2, w, h, r }; }
+function draw() {
+  const dpr = devicePixelRatio || 1; const vr = viewRect();
+  ov.width = vr.r.width * dpr; ov.height = vr.r.height * dpr; const c = ov.getContext("2d"); c.scale(dpr, dpr);
+  if (st.zone && !st.isDog) { const [x, y, w, h] = st.zone; c.fillStyle = "rgba(255,42,31,.12)"; c.strokeStyle = "#ff2a1f"; c.lineWidth = 3;
+    c.fillRect(vr.x + x * vr.w, vr.y + y * vr.h, w * vr.w, h * vr.h); c.strokeRect(vr.x + x * vr.w, vr.y + y * vr.h, w * vr.w, h * vr.h); }
+  for (const d of st.dets) { const [x, y, w, h] = d.nbox; c.strokeStyle = "#ffd600"; c.lineWidth = 2; c.strokeRect(vr.x + x * vr.w, vr.y + y * vr.h, w * vr.w, h * vr.h);
+    c.fillStyle = "#ffd600"; c.font = "13px sans-serif"; c.fillText(`${d.class} ${(d.score * 100) | 0}%`, vr.x + x * vr.w + 3, vr.y + y * vr.h + 14); }
+}
+function renderArm() { $("#arm").textContent = st.armed ? "Camera on" : "Camera paused"; $("#arm").classList.toggle("on", !st.armed); }
+$("#arm").onclick = () => { st.armed = !st.armed; renderArm(); };
+addEventListener("resize", draw);
+</script>
+</body>
+</html>

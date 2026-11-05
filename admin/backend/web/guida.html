@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Collegare il Go1</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  /* Layout: a field manual. One reading column, numbered steps because the order matters, commands you can copy. */
+  :root {
+    --bg: #f3f5f7; --paper: #ffffff; --ink: #14202b; --muted: #566573; --line: #d8dee4;
+    --accent: #1f4fc2; --accent-soft: #e6edfb; --warn: #9a4b00; --warn-soft: #fff3e2; --ok: #136c43; --ok-soft: #e4f4ec;
+    --code-bg: #0f1a24; --code-fg: #dfe8f1;
+    --f-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+    --f-body: "IBM Plex Sans", -apple-system, "Segoe UI", system-ui, sans-serif;
+    --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg: #0d141b; --paper: #131d27; --ink: #e4ebf1; --muted: #93a3b2; --line: #26333f;
+    --accent: #7ea2ff; --accent-soft: #18264a; --warn: #ffb35c; --warn-soft: #2c1e0d; --ok: #6fd6a2; --ok-soft: #0f2a1e;
+    --code-bg: #091018; --code-fg: #dfe8f1; color-scheme: dark; } }
+  :root[data-theme="dark"] {
+    --bg: #0d141b; --paper: #131d27; --ink: #e4ebf1; --muted: #93a3b2; --line: #26333f;
+    --accent: #7ea2ff; --accent-soft: #18264a; --warn: #ffb35c; --warn-soft: #2c1e0d; --ok: #6fd6a2; --ok-soft: #0f2a1e;
+    --code-bg: #091018; --code-fg: #dfe8f1; color-scheme: dark; }
+
+  body { background: var(--bg); color: var(--ink); font: 16px/1.6 var(--f-body);
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .wrap { max-width: 760px; margin: 0 auto; padding-block: 28px 64px; display: grid; gap: 28px; }
+  header { display: grid; gap: 10px; }
+  .kicker { font: 600 12px/1 var(--f-display); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+  h1 { font: 700 clamp(30px, 6vw, 44px)/1.05 var(--f-display); margin: 0; letter-spacing: -.01em; text-wrap: balance; }
+  .lead { color: var(--muted); margin: 0; max-width: 62ch; }
+  h2 { font: 600 24px/1.2 var(--f-display); margin: 0; text-wrap: balance; }
+  h3 { font: 600 17px/1.3 var(--f-display); margin: 0; letter-spacing: .01em; }
+  p { margin: 0; max-width: 66ch; }
+  a { color: var(--accent); }
+  code { font: 500 .88em var(--f-mono); background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+  ul, ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+
+  nav.toc { display: flex; flex-wrap: wrap; gap: 6px; }
+  nav.toc a { font: 500 13px/1 var(--f-body); text-decoration: none; color: var(--ink); border: 1px solid var(--line);
+    background: var(--paper); padding: 7px 10px; border-radius: 999px; }
+  nav.toc a:hover, nav.toc a:focus-visible { border-color: var(--accent); outline: none; }
+
+  section.step { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: grid; gap: 14px; scroll-margin-top: 16px; min-width: 0; }
+  .step-head { display: flex; gap: 14px; align-items: baseline; }
+  .num { font: 700 15px/1 var(--f-mono); color: var(--accent); min-width: 2ch; }
+  .note { border-left: 3px solid var(--warn); background: var(--warn-soft); padding: 12px 14px; border-radius: 0 8px 8px 0; display: grid; gap: 6px; }
+  .note b { color: var(--warn); }
+  .good { border-left: 3px solid var(--ok); background: var(--ok-soft); padding: 12px 14px; border-radius: 0 8px 8px 0; }
+  .verify { font: 600 11px/1 var(--f-display); letter-spacing: .08em; text-transform: uppercase; color: var(--warn);
+    border: 1px solid currentColor; border-radius: 4px; padding: 2px 5px; white-space: nowrap; }
+
+  .cmd { position: relative; background: var(--code-bg); color: var(--code-fg); border-radius: 8px; overflow-x: auto; }
+  .cmd pre { margin: 0; padding: 14px 92px 14px 14px; font: 14px/1.55 var(--f-mono); white-space: pre; }
+  .cmd button { position: absolute; top: 8px; right: 8px; font: 500 12px/1 var(--f-body); color: var(--code-fg);
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); border-radius: 6px; padding: 7px 10px; cursor: pointer; }
+  .cmd button:focus-visible { outline: 2px solid var(--accent); }
+  .out { background: var(--bg); border: 1px dashed var(--line); border-radius: 8px; overflow-x: auto; }
+  .out pre { margin: 0; padding: 12px 14px; font: 13px/1.5 var(--f-mono); color: var(--muted); white-space: pre; }
+
+  .options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .opt { border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+  .opt.pick { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+  .badge { justify-self: start; font: 600 11px/1 var(--f-display); letter-spacing: .08em; text-transform: uppercase;
+    background: var(--accent); color: var(--paper); padding: 4px 7px; border-radius: 4px; }
+  .badge.alt { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+  .topo { display: grid; gap: 4px; font: 13px/1.35 var(--f-mono); }
+  .topo div { display: flex; align-items: center; gap: 8px; }
+  .topo .dev { border: 1px solid var(--line); border-radius: 6px; padding: 4px 7px; background: var(--bg); white-space: nowrap; }
+  .topo .via { color: var(--muted); font-size: 12px; }
+
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  .tbl { overflow-x: auto; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font: 600 12px/1.2 var(--f-display); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  td.mono { font: 13px/1.4 var(--f-mono); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+  .check { display: grid; gap: 4px; }
+  .check label { display: flex; gap: 10px; align-items: flex-start; padding: 8px 6px; border-radius: 6px; cursor: pointer; }
+  .check label:hover { background: var(--bg); }
+  .check input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--accent); flex: none; }
+  .check input:checked + span { color: var(--muted); text-decoration: line-through; }
+  .progress { font: 500 13px/1 var(--f-mono); color: var(--muted); }
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .reset { font: 500 13px/1 var(--f-body); background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 6px; padding: 6px 9px; cursor: pointer; }
+
+  @media (max-width: 640px) {
+    .options { grid-template-columns: minmax(0, 1fr); }
+    section.step { padding: 16px; }
+    .cmd pre { padding-right: 14px; padding-top: 44px; }
+  }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <span class="kicker">Ronda · Track D Riello</span>
+    <h1>Collegare il Go1</h1>
+    <p class="lead">Dal cane spento alla prima ronda vera, in nove passi. Prima si prova il collegamento senza far muovere il cane, poi un giro lento sul posto, poi la ronda. Il cane si usa solo con lo staff del museo presente.</p>
+    <nav class="toc" aria-label="Passi">
+      <a href="#kit">Cosa serve</a><a href="#rete">Rete</a><a href="#prova">Prova</a><a href="#movimento">Primo movimento</a>
+      <a href="#avvio">Avvio</a><a href="#mappa">Punti</a><a href="#telecamere">Telecamere</a><a href="#ronda">Ronda</a><a href="#problemi">Problemi</a><a href="#indirizzi">Indirizzi</a>
+    </nav>
+  </header>
+
+  <section class="step" id="kit">
+    <div class="step-head"><span class="num">1</span><h2>Cosa serve</h2></div>
+    <ul>
+      <li>Il portatile con Ronda: cartella <code>~/Projects/robot-dog-patrol</code>, Grok che risponde (chiave in <code>secrets/.env</code>).</li>
+      <li>Il Go1 carico, con lo staff del museo e il <b>radiocomando in mano a loro</b>.</li>
+      <li>Per la rete consigliata: un adattatore <b>USB-C Ethernet</b> e un cavo di rete.</li>
+      <li>In alternativa: un iPhone con il cavo, per dare internet al portatile.</li>
+      <li>2 o 3 telefoni come telecamere, con caricatore. Un treppiede o un ripiano alto aiuta.</li>
+      <li>Nastro adesivo di carta per segnare a terra il punto di partenza del cane.</li>
+    </ul>
+    <div class="note">
+      <b>Sicurezza prima di tutto</b>
+      <p>Area libera intorno al cane, persone ad almeno 2 metri, batteria sopra il 50%. In Ronda, <b>Stop</b> annulla le missioni e <b>E-stop</b> blocca ogni movimento finché non lo rilasci. Se il portatile smette di mandare comandi, il cane si ferma da solo.</p>
+    </div>
+  </section>
+
+  <section class="step" id="rete">
+    <div class="step-head"><span class="num">2</span><h2>Scegli la rete</h2></div>
+    <p>Al cane serve il portatile, a Grok serve internet. Se il portatile entra nel WiFi del cane perde internet, quindi ci vuole una seconda strada.</p>
+    <div class="options">
+      <div class="opt pick">
+        <span class="badge">Consigliata</span>
+        <h3>A · Cavo al cane, WiFi a internet</h3>
+        <div class="topo" aria-label="Schema rete A">
+          <div><span class="dev">Go1</span><span class="via">cavo Ethernet</span><span class="dev">Mac</span></div>
+          <div><span class="dev">Mac</span><span class="via">WiFi del museo</span><span class="dev">internet · Grok</span></div>
+          <div><span class="dev">telefoni</span><span class="via">stesso WiFi</span><span class="dev">Mac</span></div>
+        </div>
+        <ol>
+          <li>Collega l'adattatore al Mac e il cavo alla porta Ethernet del cane. <span class="verify">quale porta: chiedi allo staff</span></li>
+          <li>Impostazioni di Sistema → Rete → l'adattatore (USB LAN) → Dettagli → TCP/IP.</li>
+          <li>Configura IPv4: <b>Manualmente</b>. Indirizzo <code>192.168.123.162</code>, subnet <code>255.255.255.0</code>, router vuoto.</li>
+          <li>Il WiFi resta sulla rete del museo, o sull'hotspot del telefono.</li>
+        </ol>
+        <div class="cmd"><pre>ping -c 3 192.168.123.161</pre><button type="button" data-copy>Copia</button></div>
+      </div>
+      <div class="opt">
+        <span class="badge alt">Senza cavo</span>
+        <h3>B · WiFi del cane, internet dall'iPhone</h3>
+        <div class="topo" aria-label="Schema rete B">
+          <div><span class="dev">Go1</span><span class="via">WiFi Unitree_Go…</span><span class="dev">Mac</span></div>
+          <div><span class="dev">Mac</span><span class="via">cavo USB</span><span class="dev">iPhone · internet</span></div>
+          <div><span class="dev">telefoni</span><span class="via">WiFi del cane</span><span class="dev">Mac</span></div>
+        </div>
+        <ol>
+          <li>Sul Mac entra nel WiFi <code>Unitree_Go…</code> del cane. <span class="verify">password: chiedi allo staff</span> Di fabbrica spesso è <code>00000000</code>.</li>
+          <li>iPhone col cavo, Hotspot personale acceso: sul Mac compare <b>iPhone USB</b>.</li>
+          <li>Rete → menu <b>…</b> in basso → Imposta ordine dei servizi → <b>iPhone USB sopra Wi-Fi</b>. Così internet passa dal telefono e il cane resta sul WiFi.</li>
+          <li>I telefoni telecamera entrano anche loro nel WiFi del cane. <span class="verify">verifica che vedano il Mac</span></li>
+        </ol>
+        <div class="cmd"><pre>ping -c 3 192.168.12.1
+curl -sI https://api.x.ai | head -1</pre><button type="button" data-copy>Copia</button></div>
+      </div>
+    </div>
+    <p>Il ping deve rispondere. Nella B anche <code>curl</code> deve dare una riga <code>HTTP</code>: vuol dire che internet arriva dall'iPhone.</p>
+  </section>
+
+  <section class="step" id="prova">
+    <div class="step-head"><span class="num">3</span><h2>Prova il collegamento, senza muovere il cane</h2></div>
+    <p>Lo script ascolta il cane per 3 secondi e manda solo il comando "resta fermo". Dal Terminale, nella cartella del progetto:</p>
+    <div class="cmd"><pre>cd ~/Projects/robot-dog-patrol
+.venv/bin/python scripts/go1_check.py            # rete B, WiFi
+.venv/bin/python scripts/go1_check.py --wired    # rete A, cavo</pre><button type="button" data-copy>Copia</button></div>
+    <p>Se va, vedi qualcosa del genere. I numeri saranno quelli del vostro cane:</p>
+    <div class="out"><pre>CONNECTED  ·  480 messages/s
+Serial       …
+Battery      86 %
+Mode         0  (0 idle/stand, 1 force stand, 2 walking, 5 lying …)
+Odometry     x 0.000 m   y 0.000 m
+Heading      12.4 degrees</pre></div>
+    <p>Se macOS chiede di consentire le connessioni in entrata a Python, rispondi <b>Consenti</b>. Se esce <b>NO DATA</b>, vai a <a href="#problemi">Problemi</a>.</p>
+  </section>
+
+  <section class="step" id="movimento">
+    <div class="step-head"><span class="num">4</span><h2>Primo movimento: un giro lento sul posto</h2></div>
+    <p>Con il cane in piedi, area libera e staff pronto. Lo script chiede conferma, poi lo fa ruotare a 0,3 rad/s per 2 secondi, circa 30 gradi.</p>
+    <div class="cmd"><pre>.venv/bin/python scripts/go1_check.py --turn            # aggiungi --wired con il cavo</pre><button type="button" data-copy>Copia</button></div>
+    <div class="good">Se gira di circa 30 gradi, i comandi arrivano al cane: Ronda lo può guidare.</div>
+  </section>
+
+  <section class="step" id="avvio">
+    <div class="step-head"><span class="num">5</span><h2>Avvia Ronda con il cane vero</h2></div>
+    <p>Chiudi Ronda se è aperto in simulazione (Ctrl+C nel suo Terminale) e riavvialo così. Per le prime prove la velocità massima è più bassa, 0,3 m/s:</p>
+    <div class="cmd"><pre>DOG=go1 VMAX=0.3 ./run.sh                    # rete B, WiFi
+DOG=go1 GO1_LINK=wired VMAX=0.3 ./run.sh     # rete A, cavo</pre><button type="button" data-copy>Copia</button></div>
+    <p>Apri <code>http://localhost:8000</code>. In alto il segnale <b>Dog GO1 · 86%</b> deve essere verde. Con il cane vero non avviare <code>./sim.sh</code>: le telecamere simulate prenderebbero il posto dei telefoni.</p>
+    <p>Se compare <b>dead reckoning</b>, il cane non manda la sua posizione e Ronda la stima da velocità e bussola. In una stanza va bene, ma rimetti la casa (passo 6) se si sposta.</p>
+  </section>
+
+  <section class="step" id="mappa">
+    <div class="step-head"><span class="num">6</span><h2>Insegna i punti della stanza</h2></div>
+    <p>La posizione del cane si misura dal punto in cui parte. I punti della ronda si salvano portandolo lì a mano.</p>
+    <ol>
+      <li>Segna a terra con il nastro il punto di partenza. Metti lì il cane, rivolto verso la stanza.</li>
+      <li>Nella console: <b>Manual control and spots</b> → <b>Set home here</b>. Da adesso quel punto è (0, 0): avanti è x, sinistra è y.</li>
+      <li>Guida tenendo premute le frecce, oppure W A S D, con Q ed E per girare. Rilasci e il cane si ferma.</li>
+      <li>In ogni punto scrivi l'id e il nome, poi <b>Save spot here</b>. Usa gli id già previsti:</li>
+    </ol>
+    <div class="tbl"><table>
+      <tr><th>Id</th><th>Che cos'è</th></tr>
+      <tr><td class="mono">p1 p2 p3</td><td>i tre punti della ronda nella stanza</td></tr>
+      <tr><td class="mono">z1</td><td>dove il cane va a guardare quando scatta la telecamera 1</td></tr>
+      <tr><td class="mono">z2 z3</td><td>lo stesso per le telecamere 2 e 3</td></tr>
+      <tr><td class="mono">home</td><td>la base, se diversa dal punto di partenza</td></tr>
+    </table></div>
+    <p>I punti salvati finiscono in <code>data/site.pad3.local.json</code> e restano dopo un riavvio. Se il cane comincia ad arrivare storto, rimettilo sul nastro e premi di nuovo <b>Set home here</b>.</p>
+  </section>
+
+  <section class="step" id="telecamere">
+    <div class="step-head"><span class="num">7</span><h2>Monta i telefoni come telecamere</h2></div>
+    <ol>
+      <li>Con il Mac sul WiFi del cane i telefoni non lo vedono in rete locale: nel Terminale lancia <code>./public.sh</code>, poi nella console <b>Cameras</b> → <b>Phones</b> e inquadra il QR col telefono. Funziona da qualsiasi rete, anche in 4G, e il QR contiene già il PIN. Alla prima apertura ngrok mostra un avviso: tocca <b>Visit Site</b>. Se invece telefoni e Mac sono sulla stessa rete, va bene anche l'indirizzo <code>https://192.168.x.x:8443/camera</code> stampato all'avvio.</li>
+      <li>Solo con l'indirizzo locale: il browser avvisa che il certificato non è valido, è quello del portatile. Tocca Mostra dettagli → Visita il sito web (Safari), oppure Avanzate → Procedi (Chrome). Con il link di <code>./public.sh</code> l'avviso non c'è.</li>
+      <li>Scegli la telecamera (Camera 1, 2, 3), <b>Start camera</b>, consenti l'accesso alla fotocamera.</li>
+      <li>Telefono in alto e inclinato verso la parte di sala da sorvegliare. Non c'è niente da disegnare: ad allarme inserito scatta a qualsiasi movimento nell'inquadratura.</li>
+      <li>Lascia lo schermo acceso e il telefono in carica. <b>Test event</b> manda un evento di prova alla console.</li>
+    </ol>
+    <p>Un telefono attaccato al cane può fare da <b>Camera on the dog</b>: Ronda lo usa per guardare quando il cane arriva.</p>
+    <h3>Calibra ogni telefono, una volta montato</h3>
+    <p>Serve per mandare il cane dove sta la persona. Nella console: riquadro <b>Cameras</b> → <b>Calibrate</b>, scegli il telefono.</p>
+    <ol>
+      <li>Tocca un punto del pavimento nell'immagine, poi lo stesso punto sulla pianta. Gli spigoli di pilastri e muri si agganciano da soli.</li>
+      <li>Oppure porta il cane nell'inquadratura, premi <b>Use dog position</b> e tocca i suoi piedi nell'immagine: niente da misurare.</li>
+      <li>Almeno 4 coppie, meglio 6, sparse vicino, a destra, a sinistra e a metà distanza. Evita i punti in fondo alla sala, vicino all'orizzonte.</li>
+      <li>Controlla che la pianta disegnata sopra l'immagine combaci con muri e pilastri, prova con <b>Test</b>, poi <b>Save calibration</b>.</li>
+    </ol>
+    <div class="good">Con coppie ben distribuite l'errore sul pavimento è di circa 10 cm. Se sposti un telefono, rifai la calibrazione.</div>
+  </section>
+
+  <section class="step" id="ronda">
+    <div class="step-head"><span class="num">8</span><h2>La prima ronda</h2></div>
+    <div class="check" id="checklist">
+      <div class="row"><h3>Prima di premere Start patrol</h3><span class="progress" id="progress"></span></div>
+      <label><input type="checkbox" id="c1"><span>Staff presente, radiocomando in mano, area libera</span></label>
+      <label><input type="checkbox" id="c2"><span>Segnale Dog GO1 verde, batteria sopra il 50%</span></label>
+      <label><input type="checkbox" id="c3"><span>Casa impostata sul nastro, punti p1 p2 p3 salvati</span></label>
+      <label><input type="checkbox" id="c4"><span>Ronda avviata con VMAX=0.3 per il primo giro</span></label>
+      <label><input type="checkbox" id="c5"><span>Telefoni collegati e calibrati, Test event visto in console</span></label>
+      <label><input type="checkbox" id="c6"><span>Grok verde in alto, Telegram collegato se lo usate</span></label>
+      <label><input type="checkbox" id="c7"><span>Una mano vicino a Stop e E-stop</span></label>
+      <div><button type="button" class="reset" id="resetChecks">Azzera la lista</button></div>
+    </div>
+    <p>Per provare l'allarme: <b>Arm alarm</b> in alto, aspetta i 15 secondi del ritardo d'uscita, poi passa davanti a una telecamera. Grok guarda la foto e, se va controllato, il cane viene dove sei. Il cane che passa davanti alle telecamere non fa scattare niente.</p>
+    <p>Poi <b>Patrol</b> → Room 1 patrol → <b>Start patrol</b>. Dopo un giro pulito puoi riavviare senza <code>VMAX=0.3</code>: il valore normale è 0,5 m/s.</p>
+  </section>
+
+  <section class="step" id="problemi">
+    <div class="step-head"><span class="num">9</span><h2>Se qualcosa non va</h2></div>
+    <div class="tbl"><table>
+      <tr><th>Cosa vedi</th><th>Cosa fare</th></tr>
+      <tr><td>NO DATA, oppure Dog GO1 rosso</td><td>Rete giusta? Il ping al cane risponde? Hai consentito Python nel firewall? Il cane è acceso? Con il cavo usa <code>--wired</code> e <code>GO1_LINK=wired</code>.</td></tr>
+      <tr><td>Il cane risponde ma non cammina</td><td>Deve essere in piedi: premi <b>Stand up</b>. Chiedi allo staff di lasciare il radiocomando in posizione neutra, senza modalità speciali attive. <span class="verify">da provare sul posto</span></td></tr>
+      <tr><td>Grok rosso o lento</td><td>Manca internet. Nella rete B controlla l'ordine dei servizi: iPhone USB sopra Wi-Fi.</td></tr>
+      <tr><td>Arriva nel punto sbagliato</td><td>L'odometria si è spostata. Rimettilo sul nastro, <b>Set home here</b>, e se serve salva di nuovo i punti.</td></tr>
+      <tr><td>I telefoni non si collegano</td><td>Stessa rete del Mac, indirizzo con <code>https</code> e porta <code>8443</code>, certificato accettato.</td></tr>
+      <tr><td>Va troppo veloce o gira troppo</td><td>Riavvia con <code>VMAX=0.3 WMAX=0.5</code>.</td></tr>
+      <tr><td>Qualunque cosa strana</td><td><b>E-stop</b>. Poi Release quando è tutto a posto.</td></tr>
+    </table></div>
+  </section>
+
+  <section class="step" id="indirizzi">
+    <div class="step-head"><span class="num">·</span><h2>Indirizzi da tenere a portata</h2></div>
+    <div class="tbl"><table>
+      <tr><th>Cosa</th><th>Indirizzo</th><th>Note</th></tr>
+      <tr><td>Cane, WiFi</td><td class="mono">192.168.12.1</td><td>il Mac riceve un 192.168.12.x</td></tr>
+      <tr><td>Cane, controllo di alto livello</td><td class="mono">192.168.123.161 : 8082</td><td>UDP, quello che usa Ronda</td></tr>
+      <tr><td>Mac sul cavo</td><td class="mono">192.168.123.162</td><td>subnet 255.255.255.0</td></tr>
+      <tr><td>Console Ronda</td><td class="mono">localhost : 8000</td><td>sul Mac</td></tr>
+      <tr><td>Telecamere</td><td class="mono">IP-del-Mac : 8443/camera</td><td>https, dai telefoni</td></tr>
+    </table></div>
+    <p>Questa guida è anche dentro Ronda, su <code>http://localhost:8000/guida</code>, così la apri anche senza internet.</p>
+  </section>
+</div>
+
+<script>
+  // copy buttons
+  document.querySelectorAll("[data-copy]").forEach((b) => b.addEventListener("click", async () => {
+    const text = b.parentElement.querySelector("pre").innerText.split("\n").map((l) => l.replace(/\s+#.*$/, "")).join("\n");
+    try { await navigator.clipboard.writeText(text); b.textContent = "Copiato"; }
+    catch { const r = document.createRange(); r.selectNodeContents(b.parentElement.querySelector("pre")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "Selezionato"; }
+    setTimeout(() => (b.textContent = "Copia"), 1600);
+  }));
+  // checklist, remembered on this device
+  const boxes = [...document.querySelectorAll("#checklist input")];
+  const KEY = "ronda.go1.checklist";
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch {}
+  const render = () => { const n = boxes.filter((b) => b.checked).length; document.getElementById("progress").textContent = `${n} su ${boxes.length}`; };
+  boxes.forEach((b) => { b.checked = !!saved[b.id]; b.addEventListener("change", () => { saved[b.id] = b.checked; try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch {} render(); }); });
+  document.getElementById("resetChecks").addEventListener("click", () => { boxes.forEach((b) => (b.checked = false)); saved = {}; try { localStorage.removeItem(KEY); } catch {} render(); });
+  render();
+</script>
+
+</body>
+</html>

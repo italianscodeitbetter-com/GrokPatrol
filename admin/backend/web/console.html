@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0c0e">
+<title>Ronda · Robot dog patrol</title>
+<link rel="stylesheet" href="/static/console.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <span class="mark" aria-hidden="true"></span>
+    <div><strong>Ronda</strong><span class="sub">Robot dog patrol</span></div>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="stops">
+    <button class="btn alarm" id="btnAlarm" title="Arm: any movement on the cameras is checked by Grok, a person sends the dog">Arm alarm</button>
+    <button class="btn ghost" id="btnController" title="A joystick to drive the dog, in a small window">Controller</button>
+    <a class="btn ghost" href="/guida" target="_blank" title="How to connect the real Go1">Go1 guide</a>
+    <button class="btn ghost" id="btnResetAll" title="Clear missions, schedules, scene, incidents and counters">Reset</button>
+    <button class="btn stop" id="btnStop" title="Cancel every mission, the dog stands still">Stop</button>
+    <button class="btn estop" id="btnEstop" title="Emergency stop: no motion until released">E-stop</button>
+  </div>
+</header>
+
+<div class="alert-banner" id="alertBanner" hidden>
+  <img id="alertImg" alt="">
+  <div class="alert-text"><strong id="alertTitle"></strong><p id="alertBody"></p><small id="alertMeta"></small></div>
+  <button class="btn ghost" id="alertClose">Dismiss</button>
+</div>
+
+<section class="kpis" id="kpis"></section>
+
+<main class="grid">
+  <section class="panel view">
+    <div class="panel-head">
+      <h2>Live view</h2>
+      <div class="seg" id="viewTabs"></div>
+    </div>
+    <div class="stage" id="stage">
+      <img id="view3d" alt="3D simulation view">
+      <div class="stage-empty" id="stageEmpty">
+        <p id="stageMsg"><strong>3D simulator offline.</strong> Start it with <code>./sim.sh</code>. The patrol logic keeps running on the map.</p>
+      </div>
+      <div class="stage-hud" id="hud"></div>
+    </div>
+  </section>
+
+  <section class="panel flow">
+    <div class="panel-head"><h2>Incident</h2><span class="muted" id="flowWho"></span></div>
+    <div id="flow"></div>
+  </section>
+
+  <section class="panel map">
+    <div class="panel-head"><h2>Site map</h2><span class="muted" id="mapInfo"></span></div>
+    <svg id="map" role="img" aria-label="Site map"></svg>
+  </section>
+
+  <section class="panel cams">
+    <div class="panel-head"><h2>Cameras</h2><div class="row tight"><button class="btn small" id="btnDogcam" hidden>Start dog camera</button><button class="btn small" id="btnPhones">Phones</button><button class="btn small" id="btnCalib">Calibrate</button><a class="muted small" href="/camera" target="_blank">Use a phone as camera</a></div></div>
+    <div class="cam-grid" id="camGrid"></div>
+  </section>
+
+  <section class="panel control">
+    <div class="panel-head"><h2>Patrol</h2><span class="muted" id="missionNow"></span></div>
+    <div class="row">
+      <select id="routeSel" aria-label="Route"></select>
+      <button class="btn primary" id="btnPatrol">Start patrol</button>
+      <button class="btn" id="btnStopPatrol">Stop patrol</button>
+    </div>
+    <div class="row">
+      <label class="inline">Every <input id="everyMin" type="number" min="0" step="1" value="5"> min</label>
+      <button class="btn" id="btnSchedule">Schedule</button>
+      <button class="btn" id="btnHome">Return to base</button>
+    </div>
+    <div class="queue" id="queue"></div>
+    <details class="manual">
+      <summary>Manual control and spots</summary>
+      <div class="pad">
+        <button class="btn key" data-d="0.4,0,0.6">⟲</button><button class="btn key" data-d="0.4,0,0">▲</button><button class="btn key" data-d="0.4,0,-0.6">⟳</button>
+        <button class="btn key" data-d="0,0,0.8">◀</button><button class="btn key" data-d="-0.25,0,0">▼</button><button class="btn key" data-d="0,0,-0.8">▶</button>
+      </div>
+      <p class="muted small">Hold a button, or W A S D with Q E to turn. Releasing stops the dog.</p>
+      <div class="row">
+        <input id="spotId" placeholder="spot id, e.g. z4" size="10">
+        <input id="spotName" placeholder="name" size="14">
+        <button class="btn" id="btnTeach">Save spot here</button>
+      </div>
+      <div class="row">
+        <button class="btn" id="btnZero">Set home here</button>
+        <button class="btn" id="btnLie">Lie down</button>
+        <button class="btn" id="btnStand">Stand up</button>
+        <button class="btn" id="btnReset">Release E-stop</button>
+      </div>
+    </details>
+  </section>
+
+  <section class="panel staging" id="stagingPanel">
+    <div class="panel-head"><h2>Stage a scene</h2><span class="muted small">simulation</span></div>
+    <div class="row">
+      <select id="stageCam" aria-label="Camera"></select>
+    </div>
+    <div class="stage-btns">
+      <button class="btn" data-stage="intruder"><b>Intruder</b><span>walks in and stays</span></button>
+      <button class="btn" data-stage="visitor"><b>Person passing</b><span>crosses the view</span></button>
+      <button class="btn" data-stage="bag"><b>Bag left behind</b><span>someone drops it and leaves</span></button>
+      <button class="btn" data-stage="lights"><b>Light change</b><span>nothing there: Grok should ignore it</span></button>
+      <button class="btn ghost" data-stage="clear"><b>Clear scene</b><span>remove everyone</span></button>
+    </div>
+    <p class="muted small">Arm the alarm first: disarmed, the cameras raise nothing.</p>
+    <button class="btn ghost small" id="btnTestEvent">Fire a test event on this camera</button>
+  </section>
+
+  <section class="panel chat">
+    <div class="panel-head"><h2>Console</h2><span class="muted small" id="grokState"></span></div>
+    <div class="msgs" id="msgs"></div>
+    <div class="chips-row">
+      <button class="chip" data-say="Patrol room 1">Patrol room 1</button>
+      <button class="chip" data-say="Go and check the entrance">Check the entrance</button>
+      <button class="chip" data-say="What happened in the last 15 minutes?">Last 15 min</button>
+      <button class="chip" data-say="Return to base">Return to base</button>
+    </div>
+    <form class="composer" id="chatForm">
+      <button type="button" class="btn mic" id="btnMic" title="Speak">Mic</button>
+      <input id="chatIn" autocomplete="off" placeholder="Type a command: patrol room 2, check the display case, stop">
+      <button class="btn primary" type="submit">Send</button>
+    </form>
+    <label class="inline small muted"><input type="checkbox" id="speak"> Read replies aloud</label>
+  </section>
+
+  <section class="panel log">
+    <div class="panel-head">
+      <h2>Log</h2>
+      <div class="seg" id="logFilter">
+        <button data-f="" class="on">All</button><button data-f="event">Events</button><button data-f="mission">Missions</button><button data-f="alert">Alerts</button><button data-f="grok">Grok</button>
+      </div>
+      <div class="row tight">
+        <button class="btn small" id="btnReport">End-of-shift report</button>
+        <a class="btn small" href="/api/log.csv">Export CSV</a>
+        <button class="btn small ghost" id="btnShift" title="Reset counters and incidents before a demo">New shift</button>
+      </div>
+    </div>
+    <div class="log-list" id="log"></div>
+  </section>
+</main>
+
+<dialog id="calDlg" class="wide">
+  <div class="dlg-head">
+    <h2>Calibrate camera</h2>
+    <div class="row tight">
+      <select id="calCam" aria-label="Camera"></select>
+      <button class="btn small" id="calRefresh">New frame</button>
+      <div class="seg" id="calMode"><button data-m="pair" class="on">Add pairs</button><button data-m="test">Test</button></div>
+      <label class="inline small"><input type="checkbox" id="calOverlay" checked> Plan on image</label>
+      <button class="btn ghost" id="calClose">Close</button>
+    </div>
+  </div>
+  <div class="cal-body">
+    <div class="cal-col">
+      <div class="cal-img" id="calImgBox"><img id="calImg" alt="Camera frame"><canvas id="calCanvas"></canvas></div>
+      <p class="cal-hint" id="calHint"></p>
+    </div>
+    <div class="cal-col">
+      <svg id="calMap" role="img" aria-label="Site map for calibration"></svg>
+      <div class="row">
+        <button class="btn small" id="calDog" title="The dog's position becomes the map point: then tap its feet in the image">Use dog position</button>
+        <button class="btn small" id="calUndo">Undo last</button>
+        <button class="btn small" id="calClear">Clear all</button>
+      </div>
+    </div>
+  </div>
+  <div class="cal-foot">
+    <div id="calTable" class="cal-table"></div>
+    <div class="row tight"><span id="calStatus" class="muted small"></span>
+      <button class="btn small ghost" id="calDelete">Remove calibration</button>
+      <button class="btn primary" id="calSave">Save calibration</button></div>
+  </div>
+</dialog>
+
+<dialog id="phonesDlg" class="ask">
+  <div class="dlg-head" style="padding:0 0 10px"><h2>Connect a phone</h2><button class="btn ghost" id="phonesClose">Close</button></div>
+  <div id="phonesBody"></div>
+</dialog>
+
+<dialog id="askDlg" class="ask">
+  <p id="askText"></p>
+  <div class="row tight ask-row"><button class="btn ghost" id="askNo">Cancel</button><button class="btn primary" id="askYes">Confirm</button></div>
+</dialog>
+
+<dialog id="reportDlg">
+  <div class="dlg-head"><h2>End-of-shift report</h2><button class="btn ghost" id="reportClose">Close</button></div>
+  <div id="reportBody" class="report"></div>
+</dialog>
+
+<script src="/static/console.js"></script>
+</body>
+</html>

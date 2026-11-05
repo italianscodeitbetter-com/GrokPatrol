@@ -1,0 +1,17 @@
+{
+  "name": "grokpatrol-map",
+  "private": true,
+  "description": "Scena 3D della mappa (stesso three.js della web app) impacchettata per la WebView di Flutter.",
+  "scripts": {
+    "build": "esbuild scene.ts --bundle --minify --format=iife --target=es2020,safari15 --outfile=../assets/map/scene.js",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.187.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5"
+  }
+}

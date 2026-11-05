@@ -1,0 +1,17 @@
+secrets/
+.venv/
+# runtime data at the repo root only (admin/backend/data has its own rule); grokdog_mobile/lib/data is source code
+/data/
+certs/
+__pycache__/
+sim/assets/unitree_go1/_ronda_scene.xml
+.DS_Store
+node_modules/
+.next/
+next-env.d.ts
+./graphify-out
+graphify-out/*
+secrets/*
+data/*
+grokdog/*
+web/*

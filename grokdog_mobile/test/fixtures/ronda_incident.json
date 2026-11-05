@@ -1,0 +1,1421 @@
+{
+ "state": {
+  "dog": {
+   "kind": "mujoco",
+   "connected": true,
+   "armed": true,
+   "x": 8.161,
+   "y": 6.425,
+   "yaw": 1.467,
+   "target": null,
+   "moving": false,
+   "manual": false,
+   "posture": "standing",
+   "battery": 100,
+   "odom": "mujoco",
+   "link": "ok",
+   "cmd": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "current": null,
+  "queue": [
+   {
+    "id": "m-9d95c",
+    "kind": "inspect",
+    "stops": [
+     "pt-ev-9b13f"
+    ],
+    "priority": 3,
+    "label": "Check Movimento vista da Camera 1 · ingresso est",
+    "loops": 1,
+    "loop_count": 0,
+    "idx": 0,
+    "event_ids": [
+     "ev-9b13f"
+    ],
+    "status": "queued",
+    "phase": "idle",
+    "path": [],
+    "speculative": false,
+    "created": 1793819271.970222,
+    "started": null,
+    "ended": null,
+    "note": ""
+   }
+  ],
+  "stats": {
+   "events": 2,
+   "dispatched": 2,
+   "patrol_findings": 0,
+   "filtered": 0,
+   "confirmed": 0,
+   "cleared": 0,
+   "alerts": 1,
+   "avg_arrival_s": 10.5,
+   "best_arrival_s": 10.5,
+   "open": 1
+  },
+  "alarm": {
+   "armed": false,
+   "active": false,
+   "exit_delay_s": 0,
+   "since": 1793819281.7242382,
+   "by": "test",
+   "suppressed": 0
+  },
+  "shift": 1793819231.927274,
+  "grok": {
+   "enabled": false,
+   "configured": false,
+   "auth_failed": false,
+   "ok": null,
+   "last_ms": null,
+   "calls": 0,
+   "error": null,
+   "models": {
+    "main": "grok-4.7",
+    "vision": "grok-4.3",
+    "fast": "grok-4.20-0309-non-reasoning"
+   }
+  },
+  "alerts": [
+   "console"
+  ],
+  "telegram": {
+   "enabled": false,
+   "ok": null,
+   "bot": null,
+   "chats": 0,
+   "error": null
+  },
+  "dogcam": null,
+  "schedules": {},
+  "cameras": [
+   {
+    "id": "cam-1",
+    "name": "Camera 1 · ingresso est",
+    "online": true,
+    "info": {
+     "fps": 4,
+     "armed": true,
+     "model": "mujoco segmentation",
+     "people": null,
+     "objects": null,
+     "w": null,
+     "h": null,
+     "detector": "simulated",
+     "motion": null
+    },
+    "preview_ts": 1793819281.500727,
+    "zone": null,
+    "calib_m": null
+   },
+   {
+    "id": "cam-2",
+    "name": "Camera 2 · ingresso nord",
+    "online": true,
+    "info": {
+     "fps": 4,
+     "armed": true,
+     "model": "mujoco segmentation",
+     "people": null,
+     "objects": null,
+     "w": null,
+     "h": null,
+     "detector": "simulated",
+     "motion": null
+    },
+    "preview_ts": 1793819281.5090718,
+    "zone": null,
+    "calib_m": null
+   },
+   {
+    "id": "cam-3",
+    "name": "Camera 3 · teca centrale",
+    "online": true,
+    "info": {
+     "fps": 4,
+     "armed": true,
+     "model": "mujoco segmentation",
+     "people": null,
+     "objects": null,
+     "w": null,
+     "h": null,
+     "detector": "simulated",
+     "motion": null
+    },
+    "preview_ts": 1793819281.5177028,
+    "zone": null,
+    "calib_m": null
+   },
+   {
+    "id": "dog",
+    "name": "Dog camera",
+    "online": true,
+    "info": {
+     "fps": 4,
+     "armed": true,
+     "model": "mujoco segmentation",
+     "people": null,
+     "objects": null,
+     "w": null,
+     "h": null,
+     "detector": "simulated",
+     "motion": null
+    },
+    "preview_ts": 1793819281.525503,
+    "zone": null,
+    "calib_m": null
+   },
+   {
+    "id": "sim-view",
+    "name": "sim-view",
+    "online": true,
+    "info": {
+     "fps": 4,
+     "armed": true,
+     "model": "mujoco segmentation",
+     "people": null,
+     "objects": null,
+     "w": null,
+     "h": null,
+     "detector": "simulated",
+     "motion": null
+    },
+    "preview_ts": 1793819281.7225358,
+    "zone": null,
+    "calib_m": null
+   }
+  ],
+  "sim": {
+   "connected": true,
+   "actors": [
+    {
+     "id": "intruder",
+     "kind": "person",
+     "x": 15.87,
+     "y": 8.75,
+     "yaw": 1.57
+    }
+   ],
+   "scenarios": [
+    "intruder",
+    "visitor",
+    "bag",
+    "lights",
+    "clear"
+   ],
+   "view": "follow"
+  },
+  "site": {
+   "name": "Padiglione 3",
+   "units": "meters, in the frame of the CAD model Pad3.step. The dog's home spot is where it starts and where 'Set home here' is pressed.",
+   "language": "it",
+   "model": {
+    "dir": "sim/assets/site",
+    "source": "Pad3.step",
+    "ceiling": 2.85
+   },
+   "security_rules": "When the alarm is armed the hall is closed and nobody should be inside, staff included: they disarm before entering. Anything a camera sees moving must be checked by the robot dog unless it is clearly harmless: a light or shadow change, a reflection, a screen, our own robot dog, an insect.",
+   "normal_objects": "white walls, square pillars, the ceiling grid, the internal room and its walls, partitions, the display case at the centre, benches, cameras on pillars and walls.",
+   "sim_note": "This scene is a 3D simulation of the hall and it is the live scenario of this demo: judge it exactly as if it were real, never dismiss something because it is simulated. People are drawn as simple 3D figures: treat each one as a real person. Bags and suitcases are simple boxes with a handle. The grey four-legged robot is our own patrol dog, never something to check.",
+   "home": "home",
+   "rooms": [
+    {
+     "id": "stanza",
+     "name": "Stanza interna",
+     "x": 0.0,
+     "y": 12.26,
+     "w": 5.3,
+     "h": 5.74
+    },
+    {
+     "id": "hall",
+     "name": "Padiglione 3",
+     "x": 0.0,
+     "y": 0.0,
+     "w": 16.7,
+     "h": 18.0
+    }
+   ],
+   "doors": [],
+   "spots": [
+    {
+     "id": "home",
+     "name": "Base",
+     "room": "hall",
+     "x": 8.3,
+     "y": 1.6,
+     "yaw": 1.571
+    },
+    {
+     "id": "p1",
+     "name": "Punto ronda 1",
+     "room": "hall",
+     "x": 2.8,
+     "y": 3.2
+    },
+    {
+     "id": "p2",
+     "name": "Punto ronda 2",
+     "room": "hall",
+     "x": 14.0,
+     "y": 3.2
+    },
+    {
+     "id": "p3",
+     "name": "Punto ronda 3",
+     "room": "hall",
+     "x": 8.3,
+     "y": 13.6
+    },
+    {
+     "id": "p4",
+     "name": "Punto ronda 4",
+     "room": "hall",
+     "x": 14.0,
+     "y": 14.8
+    },
+    {
+     "id": "z1",
+     "name": "Ingresso est",
+     "room": "hall",
+     "x": 13.9,
+     "y": 8.85,
+     "yaw": 0.0
+    },
+    {
+     "id": "z2",
+     "name": "Ingresso nord",
+     "room": "hall",
+     "x": 8.1,
+     "y": 14.9,
+     "yaw": 1.571
+    },
+    {
+     "id": "z3",
+     "name": "Teca centrale",
+     "room": "hall",
+     "x": 8.2,
+     "y": 6.7,
+     "yaw": 1.571
+    }
+   ],
+   "cameras": [
+    {
+     "id": "cam-1",
+     "name": "Camera 1 · ingresso est",
+     "room": "hall",
+     "x": 16.4,
+     "y": 3.2,
+     "z": 2.7,
+     "look": [
+      15.6,
+      8.8,
+      0.4
+     ],
+     "inspect_spot": "z1",
+     "entry": [
+      18.8,
+      8.85
+     ],
+     "fovy": 62,
+     "stage_area": [
+      15.0,
+      7.5,
+      16.6,
+      10.2
+     ]
+    },
+    {
+     "id": "cam-2",
+     "name": "Camera 2 · ingresso nord",
+     "room": "hall",
+     "x": 11.35,
+     "y": 12.45,
+     "z": 2.7,
+     "look": [
+      8.1,
+      17.0,
+      0.4
+     ],
+     "inspect_spot": "z2",
+     "entry": [
+      8.1,
+      19.8
+     ],
+     "fovy": 62,
+     "stage_area": [
+      6.9,
+      16.2,
+      9.3,
+      17.9
+     ]
+    },
+    {
+     "id": "cam-3",
+     "name": "Camera 3 · teca centrale",
+     "room": "hall",
+     "x": 5.55,
+     "y": 5.55,
+     "z": 2.7,
+     "look": [
+      8.2,
+      9.0,
+      0.4
+     ],
+     "inspect_spot": "z3",
+     "entry": [
+      3.0,
+      9.0
+     ],
+     "fovy": 66,
+     "stage_area": [
+      7.1,
+      7.9,
+      9.3,
+      10.3
+     ]
+    }
+   ],
+   "exhibits": [
+    {
+     "type": "case",
+     "x": 8.2,
+     "y": 9.75,
+     "w": 1.2,
+     "d": 0.6,
+     "yaw": 0.0
+    },
+    {
+     "type": "bench",
+     "x": 3.2,
+     "y": 6.6,
+     "w": 1.8,
+     "d": 0.45,
+     "yaw": 0.0
+    },
+    {
+     "type": "bench",
+     "x": 13.2,
+     "y": 6.6,
+     "w": 1.8,
+     "d": 0.45,
+     "yaw": 0.0
+    }
+   ],
+   "routes": [
+    {
+     "id": "r1",
+     "name": "Ronda padiglione",
+     "room": "hall",
+     "spots": [
+      "p1",
+      "p2",
+      "p3"
+     ]
+    },
+    {
+     "id": "r2",
+     "name": "Ronda completa",
+     "room": "hall",
+     "spots": [
+      "p1",
+      "p2",
+      "p4",
+      "p3"
+     ]
+    }
+   ],
+   "plan": {
+    "bounds": [
+     -0.4,
+     -2.15,
+     17.1,
+     18.4
+    ],
+    "solids": [],
+    "source": "Pad3.step"
+   }
+  },
+  "events": [
+   {
+    "id": "ev-7b2d3",
+    "ts": 1793819270.1164842,
+    "camera": "cam-3",
+    "kind": "motion",
+    "score": 0.67,
+    "detections": [
+     {
+      "label": "person",
+      "score": 0.67,
+      "box": [
+       0.934,
+       0.179,
+       0.059,
+       0.142
+      ]
+     },
+     {
+      "label": "motion",
+      "score": 1.0,
+      "box": [
+       0.934,
+       0.179,
+       0.059,
+       0.142
+      ]
+     }
+    ],
+    "note": "on-device detector: part of the image changed (person), alarm armed",
+    "status": "alerted",
+    "assessment": {
+     "by": "rules",
+     "verdict": "suspicious",
+     "category": "motion",
+     "severity": 3,
+     "confidence": 0.67,
+     "dispatch": true,
+     "reason": "Grok unavailable: dispatch on detector confidence",
+     "check_for": "motion"
+    },
+    "verification": {
+     "by": "rules",
+     "confirmed": null,
+     "risk": "medium",
+     "people": null,
+     "objects": [],
+     "description": "No image or Grok unavailable: manual check needed",
+     "action": "Check the camera feed",
+     "source": "dog"
+    },
+    "alert": {
+     "by": "template",
+     "title": "Allarme: motion",
+     "sms": "Teca centrale ore 20:08: No image or Grok unavailable: manual check needed. Check the camera feed",
+     "voice": "Messaggio automatico del sistema di ronda. motion in Teca centrale. No image or Grok unavailable: manual check needed"
+    },
+    "alert_results": [
+     {
+      "channel": "console",
+      "ok": true
+     }
+    ],
+    "mission_id": "m-7e0b7",
+    "images": {
+     "camera": "/api/snapshots/ev-7b2d3-camera.jpg",
+     "dog": "/api/snapshots/ev-7b2d3-dog.jpg"
+    },
+    "timings": {
+     "received": 0.0,
+     "assessed": 0.0,
+     "dispatched": 0.02,
+     "arrived": 10.53,
+     "verified": 11.6,
+     "alerted": 11.6
+    },
+    "duplicates": 0
+   },
+   {
+    "id": "ev-9b13f",
+    "ts": 1793819271.967233,
+    "camera": "cam-1",
+    "kind": "motion",
+    "score": 0.72,
+    "detections": [
+     {
+      "label": "person",
+      "score": 0.72,
+      "box": [
+       0.566,
+       0.317,
+       0.038,
+       0.246
+      ]
+     },
+     {
+      "label": "motion",
+      "score": 1.0,
+      "box": [
+       0.566,
+       0.317,
+       0.038,
+       0.246
+      ]
+     }
+    ],
+    "note": "on-device detector: part of the image changed (person), alarm armed",
+    "status": "dispatched",
+    "assessment": {
+     "by": "rules",
+     "verdict": "suspicious",
+     "category": "motion",
+     "severity": 3,
+     "confidence": 0.72,
+     "dispatch": true,
+     "reason": "Grok unavailable: dispatch on detector confidence",
+     "check_for": "motion"
+    },
+    "verification": null,
+    "alert": null,
+    "alert_results": null,
+    "mission_id": "m-9d95c",
+    "images": {
+     "camera": "/api/snapshots/ev-9b13f-camera.jpg"
+    },
+    "timings": {
+     "received": 0.0,
+     "assessed": 0.0,
+     "dispatched": 0.0
+    },
+    "duplicates": 0
+   }
+  ],
+  "log": [
+   {
+    "id": 1,
+    "ts": 1793819232.1573079,
+    "kind": "system.start",
+    "level": "info",
+    "message": "Ronda started · dog: mujoco · Grok: off",
+    "event_id": null,
+    "mission_id": null,
+    "data": {
+     "dog": "mujoco",
+     "models": {
+      "main": "grok-4.7",
+      "vision": "grok-4.3",
+      "fast": "grok-4.20-0309-non-reasoning"
+     }
+    }
+   },
+   {
+    "id": 2,
+    "ts": 1793819239.655776,
+    "kind": "sim.online",
+    "level": "info",
+    "message": "MuJoCo simulator connected · physics with the trained Go1 policy",
+    "event_id": null,
+    "mission_id": null,
+    "data": null
+   },
+   {
+    "id": 3,
+    "ts": 1793819239.658192,
+    "kind": "camera.online",
+    "level": "info",
+    "message": "Camera 1 · ingresso est connected",
+    "event_id": null,
+    "mission_id": null,
+    "data": {
+     "camera": "cam-1"
+    }
+   },
+   {
+    "id": 4,
+    "ts": 1793819239.6589131,
+    "kind": "camera.online",
+    "level": "info",
+    "message": "Camera 2 · ingresso nord connected",
+    "event_id": null,
+    "mission_id": null,
+    "data": {
+     "camera": "cam-2"
+    }
+   },
+   {
+    "id": 5,
+    "ts": 1793819239.659457,
+    "kind": "camera.online",
+    "level": "info",
+    "message": "Camera 3 · teca centrale connected",
+    "event_id": null,
+    "mission_id": null,
+    "data": {
+     "camera": "cam-3"
+    }
+   },
+   {
+    "id": 6,
+    "ts": 1793819239.660016,
+    "kind": "camera.online",
+    "level": "info",
+    "message": "dog connected",
+    "event_id": null,
+    "mission_id": null,
+    "data": {
+     "camera": "dog"
+    }
+   },
+   {
+    "id": 7,
+    "ts": 1793819239.660563,
+    "kind": "camera.online",
+    "level": "info",
+    "message": "sim-view connected",
+    "event_id": null,
+    "mission_id": null,
+    "data": {
+     "camera": "sim-view"
+    }
+   },
+   {
+    "id": 8,
+    "ts": 1793819269.275606,
+    "kind": "alarm.armed",
+    "level": "warn",
+    "message": "Alarm armed by test: active in 0 s",
+    "event_id": null,
+    "mission_id": null,
+    "data": {
+     "by": "test",
+     "delay_s": 0.0
+    }
+   },
+   {
+    "id": 9,
+    "ts": 1793819269.2774,
+    "kind": "sim.stage",
+    "level": "info",
+    "message": "Simulation: intruder at cam-1",
+    "event_id": null,
+    "mission_id": null,
+    "data": {
+     "scenario": "intruder",
+     "camera": "cam-1"
+    }
+   },
+   {
+    "id": 10,
+    "ts": 1793819269.3004549,
+    "kind": "sim.stage",
+    "level": "info",
+    "message": "intruder staged at Camera 1 · ingresso est",
+    "event_id": null,
+    "mission_id": null,
+    "data": null
+   },
+   {
+    "id": 11,
+    "ts": 1793819270.117141,
+    "kind": "event.received",
+    "level": "warn",
+    "message": "Camera 3 · teca centrale: motion (score 0.67)",
+    "event_id": "ev-7b2d3",
+    "mission_id": null,
+    "data": {
+     "camera": "cam-3",
+     "kind": "motion",
+     "score": 0.67,
+     "detections": [
+      {
+       "label": "person",
+       "score": 0.67,
+       "box": [
+        0.934,
+        0.179,
+        0.059,
+        0.142
+       ]
+      },
+      {
+       "label": "motion",
+       "score": 1.0,
+       "box": [
+        0.934,
+        0.179,
+        0.059,
+        0.142
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 12,
+    "ts": 1793819270.1179562,
+    "kind": "event.assessed",
+    "level": "info",
+    "message": "rules: suspicious · severity 3 · dispatch · Grok unavailable: dispatch on detector confidence",
+    "event_id": "ev-7b2d3",
+    "mission_id": null,
+    "data": {
+     "by": "rules",
+     "verdict": "suspicious",
+     "category": "motion",
+     "severity": 3,
+     "confidence": 0.67,
+     "dispatch": true,
+     "reason": "Grok unavailable: dispatch on detector confidence",
+     "check_for": "motion"
+    }
+   },
+   {
+    "id": 13,
+    "ts": 1793819270.134818,
+    "kind": "mission.queued",
+    "level": "info",
+    "message": "Check Teca centrale queued (priority 3)",
+    "event_id": null,
+    "mission_id": "m-7e0b7",
+    "data": {
+     "kind": "inspect",
+     "stops": [
+      "z3"
+     ]
+    }
+   },
+   {
+    "id": 14,
+    "ts": 1793819270.135332,
+    "kind": "mission.dispatched",
+    "level": "info",
+    "message": "Dog sent to Teca centrale",
+    "event_id": "ev-7b2d3",
+    "mission_id": "m-7e0b7",
+    "data": {
+     "speculative": false
+    }
+   },
+   {
+    "id": 15,
+    "ts": 1793819270.135752,
+    "kind": "sim.detector",
+    "level": "info",
+    "message": "cam-3: motion detected",
+    "event_id": null,
+    "mission_id": null,
+    "data": null
+   },
+   {
+    "id": 16,
+    "ts": 1793819270.1623008,
+    "kind": "mission.started",
+    "level": "info",
+    "message": "Check Teca centrale started",
+    "event_id": null,
+    "mission_id": "m-7e0b7",
+    "data": null
+   },
+   {
+    "id": 17,
+    "ts": 1793819271.967807,
+    "kind": "event.received",
+    "level": "warn",
+    "message": "Camera 1 · ingresso est: motion (score 0.72)",
+    "event_id": "ev-9b13f",
+    "mission_id": null,
+    "data": {
+     "camera": "cam-1",
+     "kind": "motion",
+     "score": 0.72,
+     "detections": [
+      {
+       "label": "person",
+       "score": 0.72,
+       "box": [
+        0.566,
+        0.317,
+        0.038,
+        0.246
+       ]
+      },
+      {
+       "label": "motion",
+       "score": 1.0,
+       "box": [
+        0.566,
+        0.317,
+        0.038,
+        0.246
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "id": 18,
+    "ts": 1793819271.968698,
+    "kind": "event.assessed",
+    "level": "info",
+    "message": "rules: suspicious · severity 3 · dispatch · Grok unavailable: dispatch on detector confidence",
+    "event_id": "ev-9b13f",
+    "mission_id": null,
+    "data": {
+     "by": "rules",
+     "verdict": "suspicious",
+     "category": "motion",
+     "severity": 3,
+     "confidence": 0.72,
+     "dispatch": true,
+     "reason": "Grok unavailable: dispatch on detector confidence",
+     "check_for": "motion"
+    }
+   },
+   {
+    "id": 19,
+    "ts": 1793819271.969583,
+    "kind": "event.located",
+    "level": "info",
+    "message": "Movement on the floor at (16.4, 8.7) m: the dog stops at (15.7, 8.1) facing it",
+    "event_id": "ev-9b13f",
+    "mission_id": null,
+    "data": {
+     "point": [
+      16.45,
+      8.69
+     ],
+     "spot": {
+      "id": "pt-ev-9b13f",
+      "name": "Movimento vista da Camera 1 · ingresso est",
+      "x": 15.65,
+      "y": 8.05,
+      "yaw": 0.675,
+      "temp": true
+     }
+    }
+   },
+   {
+    "id": 20,
+    "ts": 1793819271.9702258,
+    "kind": "mission.queued",
+    "level": "info",
+    "message": "Check Movimento vista da Camera 1 · ingresso est queued (priority 3)",
+    "event_id": null,
+    "mission_id": "m-9d95c",
+    "data": {
+     "kind": "inspect",
+     "stops": [
+      "pt-ev-9b13f"
+     ]
+    }
+   },
+   {
+    "id": 21,
+    "ts": 1793819271.970782,
+    "kind": "mission.dispatched",
+    "level": "info",
+    "message": "Dog sent to Movimento vista da Camera 1 · ingresso est",
+    "event_id": "ev-9b13f",
+    "mission_id": "m-9d95c",
+    "data": {
+     "speculative": false
+    }
+   },
+   {
+    "id": 22,
+    "ts": 1793819271.971503,
+    "kind": "sim.detector",
+    "level": "info",
+    "message": "cam-1: motion detected",
+    "event_id": null,
+    "mission_id": null,
+    "data": null
+   },
+   {
+    "id": 23,
+    "ts": 1793819280.6432252,
+    "kind": "mission.arrived",
+    "level": "info",
+    "message": "Dog on Teca centrale 10.53 s after the event",
+    "event_id": "ev-7b2d3",
+    "mission_id": "m-7e0b7",
+    "data": {
+     "event_to_arrival_s": 10.53
+    }
+   },
+   {
+    "id": 24,
+    "ts": 1793819281.716845,
+    "kind": "mission.verified",
+    "level": "info",
+    "message": "Teca centrale: No image or Grok unavailable: manual check needed",
+    "event_id": "ev-7b2d3",
+    "mission_id": "m-7e0b7",
+    "data": {
+     "by": "rules",
+     "confirmed": null,
+     "risk": "medium",
+     "people": null,
+     "objects": [],
+     "description": "No image or Grok unavailable: manual check needed",
+     "action": "Check the camera feed",
+     "source": "dog"
+    }
+   },
+   {
+    "id": 25,
+    "ts": 1793819281.7197921,
+    "kind": "alert.sent",
+    "level": "alert",
+    "message": "Allarme: motion: Teca centrale ore 20:08: No image or Grok unavailable: manual check needed. Check the camera feed",
+    "event_id": "ev-7b2d3",
+    "mission_id": "m-7e0b7",
+    "data": {
+     "alert": {
+      "by": "template",
+      "title": "Allarme: motion",
+      "sms": "Teca centrale ore 20:08: No image or Grok unavailable: manual check needed. Check the camera feed",
+      "voice": "Messaggio automatico del sistema di ronda. motion in Teca centrale. No image or Grok unavailable: manual check needed"
+     },
+     "results": [
+      {
+       "channel": "console",
+       "ok": true
+      }
+     ],
+     "severity": 3
+    }
+   },
+   {
+    "id": 26,
+    "ts": 1793819281.72076,
+    "kind": "mission.done",
+    "level": "info",
+    "message": "Check Teca centrale done: alert sent",
+    "event_id": null,
+    "mission_id": "m-7e0b7",
+    "data": null
+   },
+   {
+    "id": 27,
+    "ts": 1793819281.7246149,
+    "kind": "alarm.disarmed",
+    "level": "info",
+    "message": "Alarm disarmed by test",
+    "event_id": null,
+    "mission_id": null,
+    "data": {
+     "by": "test"
+    }
+   },
+   {
+    "id": 28,
+    "ts": 1793819281.727618,
+    "kind": "sim.stage",
+    "level": "info",
+    "message": "Simulation: clear at random camera",
+    "event_id": null,
+    "mission_id": null,
+    "data": {
+     "scenario": "clear",
+     "camera": null
+    }
+   }
+  ],
+  "chat": []
+ },
+ "messages": {
+  "log": {
+   "type": "log",
+   "entry": {
+    "id": 8,
+    "ts": 1793819269.275606,
+    "kind": "alarm.armed",
+    "level": "warn",
+    "message": "Alarm armed by test: active in 0 s",
+    "event_id": null,
+    "mission_id": null,
+    "data": {
+     "by": "test",
+     "delay_s": 0.0
+    }
+   }
+  },
+  "alarm": {
+   "type": "alarm",
+   "armed": true,
+   "active": true,
+   "exit_delay_s": 0,
+   "since": 1793819269.275404,
+   "by": "test",
+   "suppressed": 0
+  },
+  "tick": {
+   "type": "tick",
+   "dog": {
+    "kind": "mujoco",
+    "connected": true,
+    "armed": true,
+    "x": 8.161,
+    "y": 6.425,
+    "yaw": 1.466,
+    "target": null,
+    "moving": false,
+    "manual": false,
+    "posture": "standing",
+    "battery": 100,
+    "odom": "mujoco",
+    "link": "ok",
+    "cmd": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "current": {
+    "id": "m-7e0b7",
+    "kind": "inspect",
+    "stops": [
+     "z3"
+    ],
+    "priority": 3,
+    "label": "Check Teca centrale",
+    "loops": 1,
+    "loop_count": 0,
+    "idx": 0,
+    "event_ids": [
+     "ev-7b2d3"
+    ],
+    "status": "verifying",
+    "phase": "idle",
+    "path": [],
+    "speculative": false,
+    "created": 1793819270.1348128,
+    "started": 1793819270.162299,
+    "ended": null,
+    "note": ""
+   },
+   "queue": [
+    {
+     "id": "m-9d95c",
+     "kind": "inspect",
+     "stops": [
+      "pt-ev-9b13f"
+     ],
+     "priority": 3,
+     "label": "Check Movimento vista da Camera 1 · ingresso est",
+     "loops": 1,
+     "loop_count": 0,
+     "idx": 0,
+     "event_ids": [
+      "ev-9b13f"
+     ],
+     "status": "queued",
+     "phase": "idle",
+     "path": [],
+     "speculative": false,
+     "created": 1793819271.970222,
+     "started": null,
+     "ended": null,
+     "note": ""
+    }
+   ],
+   "stats": {
+    "events": 2,
+    "dispatched": 2,
+    "patrol_findings": 0,
+    "filtered": 0,
+    "confirmed": 0,
+    "cleared": 0,
+    "alerts": 0,
+    "avg_arrival_s": 10.5,
+    "best_arrival_s": 10.5,
+    "open": 2
+   },
+   "alarm": {
+    "armed": true,
+    "active": true,
+    "exit_delay_s": 0,
+    "since": 1793819269.275404,
+    "by": "test",
+    "suppressed": 0
+   },
+   "shift": 1793819231.927274,
+   "grok": {
+    "enabled": false,
+    "configured": false,
+    "auth_failed": false,
+    "ok": null,
+    "last_ms": null,
+    "calls": 0,
+    "error": null,
+    "models": {
+     "main": "grok-4.7",
+     "vision": "grok-4.3",
+     "fast": "grok-4.20-0309-non-reasoning"
+    }
+   },
+   "alerts": [
+    "console"
+   ],
+   "telegram": {
+    "enabled": false,
+    "ok": null,
+    "bot": null,
+    "chats": 0,
+    "error": null
+   },
+   "dogcam": null,
+   "schedules": {},
+   "cameras": [
+    {
+     "id": "cam-1",
+     "name": "Camera 1 · ingresso est",
+     "online": true,
+     "info": {
+      "fps": 4,
+      "armed": true,
+      "model": "mujoco segmentation",
+      "people": null,
+      "objects": null,
+      "w": null,
+      "h": null,
+      "detector": "simulated",
+      "motion": null
+     },
+     "preview_ts": 1793819281.500727,
+     "zone": null,
+     "calib_m": null
+    },
+    {
+     "id": "cam-2",
+     "name": "Camera 2 · ingresso nord",
+     "online": true,
+     "info": {
+      "fps": 4,
+      "armed": true,
+      "model": "mujoco segmentation",
+      "people": null,
+      "objects": null,
+      "w": null,
+      "h": null,
+      "detector": "simulated",
+      "motion": null
+     },
+     "preview_ts": 1793819281.5090718,
+     "zone": null,
+     "calib_m": null
+    },
+    {
+     "id": "cam-3",
+     "name": "Camera 3 · teca centrale",
+     "online": true,
+     "info": {
+      "fps": 4,
+      "armed": true,
+      "model": "mujoco segmentation",
+      "people": null,
+      "objects": null,
+      "w": null,
+      "h": null,
+      "detector": "simulated",
+      "motion": null
+     },
+     "preview_ts": 1793819281.5177028,
+     "zone": null,
+     "calib_m": null
+    },
+    {
+     "id": "dog",
+     "name": "Dog camera",
+     "online": true,
+     "info": {
+      "fps": 4,
+      "armed": true,
+      "model": "mujoco segmentation",
+      "people": null,
+      "objects": null,
+      "w": null,
+      "h": null,
+      "detector": "simulated",
+      "motion": null
+     },
+     "preview_ts": 1793819281.525503,
+     "zone": null,
+     "calib_m": null
+    },
+    {
+     "id": "sim-view",
+     "name": "sim-view",
+     "online": true,
+     "info": {
+      "fps": 4,
+      "armed": true,
+      "model": "mujoco segmentation",
+      "people": null,
+      "objects": null,
+      "w": null,
+      "h": null,
+      "detector": "simulated",
+      "motion": null
+     },
+     "preview_ts": 1793819281.534985,
+     "zone": null,
+     "calib_m": null
+    }
+   ],
+   "sim": {
+    "connected": true,
+    "actors": [
+     {
+      "id": "intruder",
+      "kind": "person",
+      "x": 15.87,
+      "y": 8.75,
+      "yaw": 1.57
+     }
+    ],
+    "scenarios": [
+     "intruder",
+     "visitor",
+     "bag",
+     "lights",
+     "clear"
+    ],
+    "view": "follow"
+   }
+  },
+  "event": {
+   "type": "event",
+   "event": {
+    "id": "ev-7b2d3",
+    "ts": 1793819270.1164842,
+    "camera": "cam-3",
+    "kind": "motion",
+    "score": 0.67,
+    "detections": [
+     {
+      "label": "person",
+      "score": 0.67,
+      "box": [
+       0.934,
+       0.179,
+       0.059,
+       0.142
+      ]
+     },
+     {
+      "label": "motion",
+      "score": 1.0,
+      "box": [
+       0.934,
+       0.179,
+       0.059,
+       0.142
+      ]
+     }
+    ],
+    "note": "on-device detector: part of the image changed (person), alarm armed",
+    "status": "alerted",
+    "assessment": {
+     "by": "rules",
+     "verdict": "suspicious",
+     "category": "motion",
+     "severity": 3,
+     "confidence": 0.67,
+     "dispatch": true,
+     "reason": "Grok unavailable: dispatch on detector confidence",
+     "check_for": "motion"
+    },
+    "verification": {
+     "by": "rules",
+     "confirmed": null,
+     "risk": "medium",
+     "people": null,
+     "objects": [],
+     "description": "No image or Grok unavailable: manual check needed",
+     "action": "Check the camera feed",
+     "source": "dog"
+    },
+    "alert": {
+     "by": "template",
+     "title": "Allarme: motion",
+     "sms": "Teca centrale ore 20:08: No image or Grok unavailable: manual check needed. Check the camera feed",
+     "voice": "Messaggio automatico del sistema di ronda. motion in Teca centrale. No image or Grok unavailable: manual check needed"
+    },
+    "alert_results": [
+     {
+      "channel": "console",
+      "ok": true
+     }
+    ],
+    "mission_id": "m-7e0b7",
+    "images": {
+     "camera": "/api/snapshots/ev-7b2d3-camera.jpg",
+     "dog": "/api/snapshots/ev-7b2d3-dog.jpg"
+    },
+    "timings": {
+     "received": 0.0,
+     "assessed": 0.0,
+     "dispatched": 0.02,
+     "arrived": 10.53,
+     "verified": 11.6,
+     "alerted": 11.6
+    },
+    "duplicates": 0
+   }
+  },
+  "missions": {
+   "type": "missions",
+   "current": {
+    "id": "m-7e0b7",
+    "kind": "inspect",
+    "stops": [
+     "z3"
+    ],
+    "priority": 3,
+    "label": "Check Teca centrale",
+    "loops": 1,
+    "loop_count": 0,
+    "idx": 0,
+    "event_ids": [
+     "ev-7b2d3"
+    ],
+    "status": "verifying",
+    "phase": "idle",
+    "path": [],
+    "speculative": false,
+    "created": 1793819270.1348128,
+    "started": 1793819270.162299,
+    "ended": null,
+    "note": ""
+   },
+   "queue": [
+    {
+     "id": "m-9d95c",
+     "kind": "inspect",
+     "stops": [
+      "pt-ev-9b13f"
+     ],
+     "priority": 3,
+     "label": "Check Movimento vista da Camera 1 · ingresso est",
+     "loops": 1,
+     "loop_count": 0,
+     "idx": 0,
+     "event_ids": [
+      "ev-9b13f"
+     ],
+     "status": "queued",
+     "phase": "idle",
+     "path": [],
+     "speculative": false,
+     "created": 1793819271.970222,
+     "started": null,
+     "ended": null,
+     "note": ""
+    }
+   ]
+  },
+  "alert": {
+   "type": "alert",
+   "alert": {
+    "by": "template",
+    "title": "Allarme: motion",
+    "sms": "Teca centrale ore 20:08: No image or Grok unavailable: manual check needed. Check the camera feed",
+    "voice": "Messaggio automatico del sistema di ronda. motion in Teca centrale. No image or Grok unavailable: manual check needed"
+   },
+   "spot": "Teca centrale",
+   "results": [
+    {
+     "channel": "console",
+     "ok": true
+    }
+   ],
+   "image": "/api/snapshots/ev-7b2d3-dog.jpg"
+  }
+ }
+}

@@ -1,0 +1,294 @@
+{
+  "name": "Padiglione 3",
+  "units": "meters, in the frame of the CAD model Pad3.step. The dog's home spot is where it starts and where 'Set home here' is pressed.",
+  "language": "it",
+  "model": {
+    "dir": "sim/assets/site",
+    "source": "Pad3.step",
+    "ceiling": 2.85
+  },
+  "security_rules": "When the alarm is armed the hall is closed and nobody should be inside, staff included: they disarm before entering. Anything a camera sees moving must be checked by the robot dog unless it is clearly harmless: a light or shadow change, a reflection, a screen, our own robot dog, an insect.",
+  "normal_objects": "white walls, square pillars, the ceiling grid, the internal room and its walls, partitions, the display case at the centre, a bench, six tables with chairs, a Formula 1 single-seater and a Nissan 350Z on display, the metal staircase to the upper floor, cameras on pillars and walls.",
+  "sim_note": "This scene is a 3D simulation of the hall and it is the live scenario of this demo: judge it exactly as if it were real, never dismiss something because it is simulated. People are drawn as simple 3D figures: treat each one as a real person. Bags and suitcases are simple boxes with a handle. The grey four-legged robot is our own patrol dog, never something to check.",
+  "home": "home",
+  "rooms": [
+    {
+      "id": "stanza",
+      "name": "Stanza interna",
+      "x": 0.0,
+      "y": 12.26,
+      "w": 5.3,
+      "h": 5.74
+    },
+    {
+      "id": "hall",
+      "name": "Padiglione 3",
+      "x": 0.0,
+      "y": 0.0,
+      "w": 16.7,
+      "h": 18.0
+    }
+  ],
+  "doors": [],
+  "spots": [
+    {
+      "id": "home",
+      "name": "Base",
+      "room": "hall",
+      "x": 8.3,
+      "y": 1.6,
+      "yaw": 1.571
+    },
+    {
+      "id": "p1",
+      "name": "Punto ronda 1",
+      "room": "hall",
+      "x": 4.65,
+      "y": 1.65
+    },
+    {
+      "id": "p2",
+      "name": "Punto ronda 2",
+      "room": "hall",
+      "x": 12.35,
+      "y": 3.75
+    },
+    {
+      "id": "p3",
+      "name": "Punto ronda 3",
+      "room": "hall",
+      "x": 10.55,
+      "y": 13.65
+    },
+    {
+      "id": "p4",
+      "name": "Punto ronda 4",
+      "room": "hall",
+      "x": 14.0,
+      "y": 14.8
+    },
+    {
+      "id": "z1",
+      "name": "Ingresso est",
+      "room": "hall",
+      "x": 13.95,
+      "y": 10.95,
+      "yaw": 0.0
+    },
+    {
+      "id": "z2",
+      "name": "Ingresso nord",
+      "room": "hall",
+      "x": 10.55,
+      "y": 14.45,
+      "yaw": 1.571
+    },
+    {
+      "id": "z3",
+      "name": "Teca centrale",
+      "room": "hall",
+      "x": 9.45,
+      "y": 7.15,
+      "yaw": 1.571
+    }
+  ],
+  "cameras": [
+    {
+      "id": "cam-1",
+      "name": "Camera 1 · ingresso est",
+      "room": "hall",
+      "x": 16.4,
+      "y": 3.2,
+      "z": 2.7,
+      "look": [
+        15.6,
+        8.8,
+        0.4
+      ],
+      "inspect_spot": "z1",
+      "entry": [
+        18.8,
+        8.85
+      ],
+      "fovy": 62,
+      "stage_area": [
+        15.0,
+        7.5,
+        16.6,
+        10.2
+      ]
+    },
+    {
+      "id": "cam-2",
+      "name": "Camera 2 · ingresso nord",
+      "room": "hall",
+      "x": 11.35,
+      "y": 12.45,
+      "z": 2.7,
+      "look": [
+        8.1,
+        17.0,
+        0.4
+      ],
+      "inspect_spot": "z2",
+      "entry": [
+        8.1,
+        19.8
+      ],
+      "fovy": 62,
+      "stage_area": [
+        6.9,
+        16.2,
+        9.3,
+        17.9
+      ]
+    },
+    {
+      "id": "cam-3",
+      "name": "Camera 3 · teca centrale",
+      "room": "hall",
+      "x": 5.55,
+      "y": 5.55,
+      "z": 2.7,
+      "look": [
+        8.2,
+        9.0,
+        0.4
+      ],
+      "inspect_spot": "z3",
+      "entry": [
+        3.0,
+        9.0
+      ],
+      "fovy": 66,
+      "stage_area": [
+        7.1,
+        7.9,
+        9.3,
+        10.3
+      ]
+    }
+  ],
+  "exhibits": [
+    {
+      "type": "case",
+      "x": 8.2,
+      "y": 9.75,
+      "w": 1.2,
+      "d": 0.6,
+      "yaw": 0.0
+    },
+    {
+      "type": "bench",
+      "x": 3.2,
+      "y": 6.6,
+      "w": 1.8,
+      "d": 0.45,
+      "yaw": 0.0
+    },
+    {
+      "type": "table",
+      "name": "Tavolo 1",
+      "x": 7.3,
+      "y": 8.35,
+      "w": 3.1,
+      "d": 2.0,
+      "yaw": 0.0
+    },
+    {
+      "type": "table",
+      "name": "Tavolo 2",
+      "x": 8.22,
+      "y": 5.45,
+      "w": 3.1,
+      "d": 2.0,
+      "yaw": 0.0
+    },
+    {
+      "type": "table",
+      "name": "Tavolo 3",
+      "x": 14.3,
+      "y": 5.25,
+      "w": 3.0,
+      "d": 2.3,
+      "yaw": 0.0
+    },
+    {
+      "type": "table",
+      "name": "Tavolo 4",
+      "x": 2.575,
+      "y": 3.425,
+      "w": 3.05,
+      "d": 3.35,
+      "yaw": 0.0
+    },
+    {
+      "type": "table",
+      "name": "Tavolo 5",
+      "x": 10.425,
+      "y": 2.225,
+      "w": 2.55,
+      "d": 2.65,
+      "yaw": 0.0
+    },
+    {
+      "type": "table",
+      "name": "Tavolo 6",
+      "x": 14.2,
+      "y": 2.05,
+      "w": 3.2,
+      "d": 2.3,
+      "yaw": 0.0
+    },
+    {
+      "type": "car",
+      "name": "Monoposto F1",
+      "x": 8.5,
+      "y": 14.7,
+      "w": 2.8,
+      "d": 5.6,
+      "yaw": 0.0
+    },
+    {
+      "type": "car",
+      "name": "Nissan 350Z",
+      "x": 13.95,
+      "y": 8.775,
+      "w": 4.8,
+      "d": 2.95,
+      "yaw": 0.0
+    },
+    {
+      "type": "stairs",
+      "name": "Scala al piano superiore",
+      "x": 4.525,
+      "y": 11.45,
+      "w": 2.65,
+      "d": 1.0,
+      "yaw": 0.0
+    }
+  ],
+  "routes": [
+    {
+      "id": "r1",
+      "name": "Ronda padiglione",
+      "room": "hall",
+      "spots": [
+        "p1",
+        "p2",
+        "p3"
+      ]
+    },
+    {
+      "id": "r2",
+      "name": "Ronda completa",
+      "room": "hall",
+      "spots": [
+        "p1",
+        "p2",
+        "p4",
+        "p3"
+      ]
+    }
+  ]
+}

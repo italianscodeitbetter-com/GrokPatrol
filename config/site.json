@@ -1,0 +1,198 @@
+{
+  "name": "Museum test site",
+  "units": "meters. Origin = the dog's home pose, x forward, y to the left",
+  "language": "it",
+  "security_rules": "Restricted area: the zone outlined in red on each camera. Museum staff wear a lanyard or a staff vest and may enter restricted areas. Exhibits, statues, mannequins, posters and pictures of people are not people. Any bag, backpack, suitcase or box left alone near an exhibit for more than a few seconds is a possible abandoned object. Visitors walking past the edge of a zone without stopping are not an intrusion.",
+  "home": "home",
+  "rooms": [
+    {
+      "id": "sala1",
+      "name": "Room 1",
+      "x": -1.0,
+      "y": -3.0,
+      "w": 9.0,
+      "h": 6.0
+    },
+    {
+      "id": "sala2",
+      "name": "Room 2",
+      "x": 8.0,
+      "y": -3.0,
+      "w": 7.0,
+      "h": 6.0
+    }
+  ],
+  "doors": [
+    {
+      "id": "door12",
+      "x": 8.0,
+      "y": 0.0,
+      "rooms": [
+        "sala1",
+        "sala2"
+      ]
+    },
+    {
+      "id": "entrance",
+      "x": 1.5,
+      "y": -3.0,
+      "rooms": [
+        "sala1",
+        "outside"
+      ]
+    }
+  ],
+  "spots": [
+    {
+      "id": "home",
+      "name": "Home base",
+      "room": "sala1",
+      "x": 0.0,
+      "y": 0.0,
+      "yaw": 0.0
+    },
+    {
+      "id": "p1",
+      "name": "Patrol point 1",
+      "room": "sala1",
+      "x": 2.0,
+      "y": 1.6
+    },
+    {
+      "id": "p2",
+      "name": "Patrol point 2",
+      "room": "sala1",
+      "x": 6.0,
+      "y": 1.6
+    },
+    {
+      "id": "p3",
+      "name": "Patrol point 3",
+      "room": "sala1",
+      "x": 4.0,
+      "y": -1.6
+    },
+    {
+      "id": "z1",
+      "name": "Restricted display case",
+      "room": "sala1",
+      "x": 6.5,
+      "y": -0.1,
+      "yaw": -1.571
+    },
+    {
+      "id": "z2",
+      "name": "Entrance",
+      "room": "sala1",
+      "x": 1.5,
+      "y": -0.4,
+      "yaw": -1.571
+    },
+    {
+      "id": "z3",
+      "name": "Room 2 exhibit",
+      "room": "sala2",
+      "x": 12.0,
+      "y": 0.2,
+      "yaw": 1.571
+    }
+  ],
+  "cameras": [
+    {
+      "id": "cam-1",
+      "name": "Camera 1 · display case",
+      "room": "sala1",
+      "x": 4.6,
+      "y": 2.85,
+      "inspect_spot": "z1",
+      "z": 2.6,
+      "look": [
+        6.5,
+        -2.0,
+        0.6
+      ],
+      "zone_world": [
+        5.4,
+        -3.0,
+        7.6,
+        -1.2
+      ],
+      "entry": [
+        9.4,
+        0.6
+      ]
+    },
+    {
+      "id": "cam-2",
+      "name": "Camera 2 · entrance",
+      "room": "sala1",
+      "x": -0.9,
+      "y": 2.8,
+      "inspect_spot": "z2",
+      "z": 2.6,
+      "look": [
+        1.5,
+        -2.2,
+        0.6
+      ],
+      "zone_world": [
+        0.3,
+        -3.0,
+        2.7,
+        -1.4
+      ],
+      "entry": [
+        1.5,
+        -4.2
+      ]
+    },
+    {
+      "id": "cam-3",
+      "name": "Camera 3 · room 2",
+      "room": "sala2",
+      "x": 14.9,
+      "y": -2.9,
+      "inspect_spot": "z3",
+      "z": 2.6,
+      "look": [
+        12.0,
+        2.0,
+        0.6
+      ],
+      "zone_world": [
+        10.8,
+        1.0,
+        13.2,
+        3.0
+      ],
+      "entry": [
+        8.8,
+        -1.2
+      ]
+    }
+  ],
+  "routes": [
+    {
+      "id": "r1",
+      "name": "Room 1 patrol",
+      "room": "sala1",
+      "spots": [
+        "p1",
+        "p2",
+        "p3"
+      ]
+    },
+    {
+      "id": "r2",
+      "name": "Full patrol",
+      "spots": [
+        "p1",
+        "p2",
+        "z3",
+        "p3"
+      ]
+    }
+  ],
+  "sim_note": "This scene is a 3D simulation of the museum and it is the live scenario of this demo: judge it exactly as if it were real, never dismiss something because it is simulated. People are drawn as simple 3D figures: treat each one as a real person. Bags and suitcases are simple boxes with a handle. The restricted zone is the red tape on the floor. A figure wearing a yellow high-visibility vest is museum staff. The grey four-legged robot is our own patrol dog, never an anomaly.",
+  "normal_objects": "wooden display cabinets with a glass top and objects inside, white pedestals with sculptures, wooden benches, framed paintings, the red tape on the floor, the cameras on the walls."
+}

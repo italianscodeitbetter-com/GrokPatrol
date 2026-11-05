@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0b0c0e">
+<title>Ronda · Controller</title>
+<style>
+  :root { --bg: #0b0c0e; --panel: #15171c; --line: #2a2d34; --text: #e8e9eb; --muted: #8b9099; --accent: #4f8cff;
+    --ok: #3ccf8e; --warn: #f2b33d; --bad: #ff3b30; color-scheme: dark;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); overscroll-behavior: none; }
+  body { display: grid; grid-template-rows: auto 1fr auto; padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); gap: 12px; user-select: none; }
+  header { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  header b { font-size: 17px; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); font-size: 13px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+  .dot.ok { background: var(--ok); } .dot.warn { background: var(--warn); } .dot.bad { background: var(--bad); }
+  main { display: grid; place-items: center; gap: 16px; }
+  .stick { width: min(72vw, 300px); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, #1c1f26 0 55%, #15171c 56%);
+    border: 1px solid var(--line); position: relative; touch-action: none; }
+  .stick::before, .stick::after { content: ""; position: absolute; background: var(--line); }
+  .stick::before { left: 50%; top: 12%; bottom: 12%; width: 1px; } .stick::after { top: 50%; left: 12%; right: 12%; height: 1px; }
+  .knob { position: absolute; width: 34%; aspect-ratio: 1; border-radius: 50%; left: 33%; top: 33%; background: var(--accent);
+    box-shadow: 0 6px 20px rgba(79,140,255,.35); transition: transform .08s; z-index: 1; }
+  .stick.live .knob { transition: none; }
+  .labels { width: min(72vw, 300px); display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; }
+  .readout { font: 13px ui-monospace, Menlo, monospace; color: var(--muted); min-height: 18px; }
+  footer { display: grid; gap: 10px; }
+  .row { display: flex; gap: 8px; }
+  .row > * { flex: 1; }
+  button { font: inherit; color: inherit; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 10px; min-height: 52px; }
+  button:active { transform: translateY(1px); }
+  .stop { background: #2a1416; border-color: #5a2226; color: #ffb4ae; font-weight: 600; }
+  .estop { background: var(--bad); border-color: var(--bad); color: #fff; font-weight: 700; }
+  label.speed { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+  label.speed input { flex: 1; accent-color: var(--accent); }
+  .warnbox { background: #2b220f; border: 1px solid #6b5214; color: #ffd27a; padding: 10px 12px; border-radius: 10px; font-size: 14px; }
+</style>
+</head>
+<body>
+<header>
+  <b>Ronda controller</b>
+  <span class="pill"><span class="dot" id="dot"></span><span id="state">connecting</span></span>
+</header>
+<main>
+  <div class="warnbox" id="hint" hidden></div>
+  <div class="stick" id="stick" aria-label="Joystick: up forward, down back, left and right turn"><div class="knob" id="knob"></div></div>
+  <div class="labels"><span>turn left</span><span>forward / back</span><span>turn right</span></div>
+  <div class="readout" id="readout">release to stop</div>
+</main>
+<footer>
+  <label class="speed">Speed <input type="range" id="speed" min="0.1" max="0.5" step="0.05" value="0.3"> <span id="speedv">0.30 m/s</span></label>
+  <div class="row"><button id="stand">Stand up</button><button id="lie">Lie down</button></div>
+  <div class="row"><button class="stop" id="stop">Stop</button><button class="estop" id="estop">E-stop</button></div>
+</footer>
+<script>
+const $ = (s) => document.querySelector(s);
+let cmd = [0, 0, 0], active = false, sending = null, armed = true;
+const post = (body) => fetch("/api/command", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then((r) => r.json()).catch(() => ({}));
+const speed = () => +$("#speed").value;
+$("#speed").oninput = () => { $("#speedv").textContent = speed().toFixed(2) + " m/s"; };
+
+// joystick: up and down move forward and back, left and right turn. Releasing stops the dog.
+const stick = $("#stick"), knob = $("#knob");
+function setFromPointer(e) {
+  const r = stick.getBoundingClientRect(), R = r.width / 2;
+  let dx = (e.clientX - r.left - R) / R, dy = (e.clientY - r.top - R) / R;
+  const m = Math.hypot(dx, dy); if (m > 1) { dx /= m; dy /= m; }
+  knob.style.transform = `translate(${dx * R * 0.66}px, ${dy * R * 0.66}px)`;
+  const dz = (v) => (Math.abs(v) < 0.12 ? 0 : (v - Math.sign(v) * 0.12) / 0.88);
+  cmd = [-dz(dy) * speed(), 0, -dz(dx) * (speed() / 0.5) * 0.9];
+  $("#readout").textContent = `forward ${cmd[0].toFixed(2)} m/s · turn ${cmd[2].toFixed(2)} rad/s`;
+}
+function send() { post({ action: "drive", vx: cmd[0], vy: cmd[1], wz: cmd[2] }); }
+stick.addEventListener("pointerdown", (e) => {
+  e.preventDefault(); stick.setPointerCapture(e.pointerId); active = true; stick.classList.add("live"); setFromPointer(e);
+  send(); clearInterval(sending); sending = setInterval(send, 100);
+});
+stick.addEventListener("pointermove", (e) => { if (active) setFromPointer(e); });
+const release = () => {
+  if (!active) return; active = false; stick.classList.remove("live"); clearInterval(sending);
+  cmd = [0, 0, 0]; send(); knob.style.transform = ""; $("#readout").textContent = "release to stop";
+};
+["pointerup", "pointercancel", "lostpointercapture"].forEach((ev) => stick.addEventListener(ev, release));
+document.addEventListener("visibilitychange", () => { if (document.hidden) release(); });
+
+$("#stand").onclick = () => post({ action: "stand" });
+$("#lie").onclick = () => post({ action: "lie" });
+$("#stop").onclick = () => post({ action: "stop" });
+$("#estop").onclick = async () => { await post({ action: armed ? "estop" : "reset" }); };
+
+// state of the dog, once a second
+async function poll() {
+  try {
+    const r = await fetch("/api/poll?log_after=999999999").then((x) => x.json());
+    const d = r.tick.dog; armed = d.armed;
+    const st = !d.connected ? (d.link === "standby" ? ["warn", "on, waiting for L1 + START"] : ["bad", "dog not connected"])
+      : !d.armed ? ["bad", "EMERGENCY STOP"] : ["ok", `${d.kind.toUpperCase()} · ${d.battery != null ? d.battery + "%" : "ok"} · ${d.posture}`];
+    $("#dot").className = "dot " + st[0]; $("#state").textContent = st[1];
+    $("#estop").textContent = d.armed ? "E-stop" : "Release";
+    const hint = $("#hint");
+    hint.hidden = !(d.kind === "go1" && d.link === "standby");
+    hint.textContent = "The dog is on but not in sport mode: on the remote press L1 + START together, it stands up.";
+  } catch { $("#dot").className = "dot bad"; $("#state").textContent = "server not reachable"; }
+  setTimeout(poll, 1000);
+}
+poll();
+</script>
+</body>
+</html>
